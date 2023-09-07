@@ -131,4 +131,14 @@ public interface AdminMapper {
 
 	void updNotice(HashMap<String, Object> params);
 
+	HashMap<String, Object> chkClanDel(String sEmail);
+
+	void clanDel_updAccount_ins(String sEmail);
+	
+	void clanDel_updAccount_del(String sEmail);
+
+	void clanDel(String sEmail);
+
+	void updUsrDelAuth_c(HashMap<String, Object> params);
+
 }

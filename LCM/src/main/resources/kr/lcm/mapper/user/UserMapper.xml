@@ -60,4 +60,75 @@ INSERT INTO USER (
    WHERE A.EMAIL  = #{email}
 </update>
 
+<select id="updPwChk" parameterType="hashMap" resultType="hashMap">
+  SELECT A.EMAIL AS EMAIL
+    FROM USER A
+   WHERE A.EMAIL = #{sEmail}
+	 AND A.PW = #{prePw}
+	 AND A.EMAIL_AUTH = 'pass'
+</select>
+
+<update id="updPw">
+UPDATE USER A
+   SET A.PW = #{chgPw}
+ WHERE A.EMAIL = #{sEmail}
+   AND A.PW = #{prePw}
+   AND A.EMAIL_AUTH = 'pass'
+</update>
+
+<select id="chkMypageClan" parameterType="hashMap" resultType="hashMap">
+  SELECT A.NICK        AS NICK
+       , A.PREFER_LINE AS LINE
+       , A.AUTH        AS AUTH
+    FROM ACCOUNT A
+   WHERE A.EMAIL = #{sEmail}
+</select>
+
+<update id="updMypageClan">
+UPDATE ACCOUNT A
+   SET A.NICK = #{clanNick}
+     , A.PREFER_LINE = #{clanLine}
+ WHERE A.EMAIL = #{sEmail}
+   AND A. AUTH IN (1,2,3)
+</update>
+
+<select id="chkClanSecAjax" parameterType="hashMap" resultType="hashMap">
+  SELECT A.AUTH        AS AUTH
+    FROM ACCOUNT A
+   WHERE A.EMAIL = #{sEmail}
+</select>
+
+<insert id="clanSecAjax_ins">
+  INSERT INTO ACCOUNT_WITHDRAW
+  SELECT EMAIL
+       , CLAN
+       , NICK
+       , PREFER_LINE
+       , AUTH
+       , ELO
+    FROM ACCOUNT
+   WHERE EMAIL = #{sEmail}
+     AND CLAN = getClan(#{sEmail})
+</insert>
+
+<delete id="clanSecAjax_del">
+DELETE FROM ACCOUNT
+      WHERE EMAIL = #{sEmail}
+        AND CLAN = getClan(#{sEmail})
+</delete>
+
+<insert id="lcmSecAjax_ins">
+  INSERT INTO USER_WITHDRAW
+  SELECT A.EMAIL
+       , A.PW
+       , A.EMAIL_AUTH
+    FROM USER A
+   WHERE A.EMAIL = #{sEmail}
+</insert>
+
+<delete id="lcmSecAjax_del">
+DELETE FROM USER
+      WHERE EMAIL = #{sEmail}
+</delete>
+
 </mapper>

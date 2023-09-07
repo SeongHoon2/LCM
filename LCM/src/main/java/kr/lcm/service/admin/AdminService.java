@@ -73,4 +73,8 @@ public interface AdminService {
 
 	void updNotice(HashMap<String, Object> params);
 
+	HashMap<String, Object> chkClanDel(String sEmail);
+
+	void clanDel(String sEmail);
+
 }

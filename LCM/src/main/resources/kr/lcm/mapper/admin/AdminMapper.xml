@@ -128,6 +128,13 @@ INSERT INTO BOARD_CTG (
      AND A.CLAN = getClan(#{email})
 </update>
 
+<update id="updUsrDelAuth_c">
+  UPDATE CLAN A
+     SET A.MASTER = #{usrEmail}
+   WHERE A.MASTER = #{email}
+     AND A.NM = getClan(#{email})
+</update>
+
 <update id="updUsrBan_ins">
   INSERT INTO ACCOUNT_WITHDRAW
   SELECT EMAIL
@@ -863,6 +870,35 @@ UPDATE CLAN A
    SET A.NOTICE = #{noticeText}
  WHERE A.NM = getClan(#{sEmail})
    AND A.DEL_YN = 'N'
+</update>
+
+<select id="chkClanDel" resultType="hashMap" parameterType="hashMap">
+  SELECT A.AUTH
+    FROM ACCOUNT A
+   WHERE A.EMAIL = #{sEmail}
+</select>
+
+<insert id="clanDel_updAccount_ins">
+  INSERT INTO ACCOUNT_WITHDRAW
+  SELECT EMAIL
+       , CLAN
+       , NICK
+       , PREFER_LINE
+       , AUTH
+       , ELO
+    FROM ACCOUNT
+   WHERE CLAN = getClan(#{sEmail})
+</insert>
+
+<delete id="clanDel_updAccount_del">
+DELETE FROM ACCOUNT
+      WHERE CLAN  = (SELECT A.NM FROM CLAN A WHERE A.MASTER = #{sEmail})
+</delete>
+
+<update id="clanDel">
+UPDATE CLAN A
+   SET A.DEL_YN = 'Y'
+ WHERE A.MASTER = #{sEmail}
 </update>
 
 </mapper>

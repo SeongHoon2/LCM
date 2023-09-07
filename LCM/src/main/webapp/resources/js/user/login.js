@@ -5,7 +5,7 @@ function drawInitLogin(){
 	con += "<input type=\"text\" class=\"content_loginDiv_emailTxt\" id=\"emailTxt\" placeHolder=\"E-mail\" maxlength=\"50\"/>";
 	con += "</div>";
 	con += "<div class=\"content_loginDiv_pw\">";
-	con += "<input type=\"password\" class=\"content_loginDiv_pwTxt\" id=\"pwTxt\" placeHolder=\"PW\" maxlength=\"20\"/>";
+	con += "<input type=\"password\" class=\"content_loginDiv_pwTxt\" id=\"pwTxt\" placeHolder=\"PW\" maxlength=\"16\"/>";
 	con += "</div>";
 	con += "<div class=\"content_loginDiv_btn\">";
 	con += "<button class=\"content_loginDiv_LoginBtn\" id=\"loginBtn\">로그인</button>&nbsp;&nbsp;";

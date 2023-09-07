@@ -445,5 +445,28 @@ public class AdminController {
 		return mapper.writeValueAsString(modelMap);
 	}
 	
+	//chkClanDel
+	@RequestMapping(value = "/chkClanDelAjax", method = RequestMethod.POST, produces = "text/json;charset=UTF-8")
+	@ResponseBody public String chkClanDelAjax(HttpSession session) throws Throwable {
+		ObjectMapper mapper = new ObjectMapper();
+		HashMap<String, Object> modelMap = new HashMap<String, Object>();
+		String sEmail = session.getAttribute("sEmail").toString();
+		HashMap<String, Object> chkClanDel = iAdminService.chkClanDel(sEmail);
+		if(chkClanDel!=null&&!chkClanDel.isEmpty()) {
+			if(chkClanDel.get("AUTH").toString().equals("3")) {
+				iUtilService.insertLog("클랜 삭제", sEmail, "");
+				iAdminService.clanDel(sEmail);
+				modelMap.put("result", "pass");
+			}
+			else{
+				modelMap.put("result", "fail");
+			}
+		}
+		else{
+			modelMap.put("result", "fail");
+		}
+		return mapper.writeValueAsString(modelMap);
+	}
+	
 	
 }

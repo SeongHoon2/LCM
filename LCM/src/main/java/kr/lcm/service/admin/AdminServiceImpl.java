@@ -189,6 +189,7 @@ public class AdminServiceImpl implements AdminService{
 	 */
 	@Override
 	public void updUsrDelAuth(HashMap<String, Object> params) {
+		adminMapper.updUsrDelAuth_c(params);
 		adminMapper.updUsrDelAuth_p(params);
 		adminMapper.updUsrDelAuth_m(params);
 	}
@@ -641,6 +642,18 @@ public class AdminServiceImpl implements AdminService{
 	@Override
 	public void updNotice(HashMap<String, Object> params) {
 		adminMapper.updNotice(params);
+	}
+
+	@Override
+	public HashMap<String, Object> chkClanDel(String sEmail) {
+		return adminMapper.chkClanDel(sEmail);
+	}
+
+	@Override
+	public void clanDel(String sEmail) {
+		adminMapper.clanDel_updAccount_ins(sEmail);
+		adminMapper.clanDel_updAccount_del(sEmail);
+		adminMapper.clanDel(sEmail);
 	}
 	
 	

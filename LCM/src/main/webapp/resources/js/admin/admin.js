@@ -6,7 +6,8 @@ function drawAdminMenu(){
 	adminHtml += "<button class=\"adminMenuBtn\" id=\"adminLogoBtn\">로고</button>&nbsp;&nbsp;";
 	adminHtml += "<button class=\"adminMenuBtn\" id=\"adminBoardBtn\">게시판</button>&nbsp;&nbsp;";
 	adminHtml += "<button class=\"adminMenuBtn\" id=\"adminGameBtn\">경기</button>&nbsp;&nbsp;";
-	adminHtml += "<button class=\"adminMenuBtn\" id=\"adminEloBtn\">ELO</button>";
+	adminHtml += "<button class=\"adminMenuBtn\" id=\"adminEloBtn\">ELO</button>&nbsp;&nbsp;";
+	adminHtml += "<button class=\"adminMenuBtn\" id=\"adminDelBtn\">클랜 삭제</button>";
 	$(".adminMenuBtnDiv").html(adminHtml);
 
 	var urlTxt = $(location).attr('pathname').trim().split("/")[2];

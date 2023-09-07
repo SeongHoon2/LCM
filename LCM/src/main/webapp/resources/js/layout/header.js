@@ -21,7 +21,7 @@ function checkLogin(){
 
 function drawLogout(){
 	var con = "";
-	//con += "<button type=\"button\" class=\"loginBtn\" onclick=\"location.replace(\'/user/mypage\');\">내정보</button>";
+	con += "<button type=\"button\" class=\"loginBtn\" onclick=\"location.replace(\'/user/mypageInfo\');\">내정보</button>";
 	con += "<button type=\"button\" class=\"loginBtn\" onclick=\"logout();\">로그아웃</button>";
 	$(".loginDiv").html(con);
 }

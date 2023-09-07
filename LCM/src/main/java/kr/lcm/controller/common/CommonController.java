@@ -80,6 +80,14 @@ public class CommonController {
 			out.println("<script>alert(\"로그인이 필요합니다.\");location.replace(\"/user/login\");</script>");
 			out.flush();
 		}
+		else if(page.equals("mypageInfo")||page.equals("mypageClan")||page.equals("mypageSec")){
+			if(session.getAttribute("sEmail")==null||session.getAttribute("sEmail")=="") {
+				url = "redirect:/home/home";
+			}
+			else {
+				url = pageLocation+"/"+page;
+			}
+		}
 		else {
 			AccountVO params = new AccountVO();
 			params.setEmail(session.getAttribute("sEmail").toString());

@@ -1,0 +1,89 @@
+@charset "UTF-8";
+
+.admin_board{
+	width: 1200px;
+    margin: 0 auto;
+	margin-top : 20px;
+    text-align : center;
+} 
+
+.admin_board_conDiv{
+	width : 100%;
+	text-align : center;
+}
+
+.admin_board_con{
+	width : 470px;
+	min-height : 481px;
+	display : inline-block;
+	border : 1px solid lightgray;
+}
+
+.admin_board_con_title{
+	width : 100%;
+	height : 100%;
+}
+
+.admin_board_con_title_div{
+	height: 30px;
+	background-color : #3275A2;
+	color : white;
+	font-weight : bold;
+	display : inline-block;
+	vertical-align : top;
+	line-height : 2; 
+}
+
+.ctgDiv{
+	line-height : 2.5;
+	height : 40px;	
+}
+
+.eCtgDiv{
+	line-height : 3;
+	height : 40px;
+	border-bottom : 1px solid lightgray;	
+}
+
+.eCtgDivTh{
+	display : inline-block;
+	vertical-align : top;	
+}
+
+.admin_board_btnDiv{
+	margin-top : 10px;
+	width : 100%;
+	height : 30px;
+	text-align : center;
+}
+
+.admin_board_btnDiv_btn{
+	width: 540px;
+    height: 24px;
+    display: inline-block;
+    text-align : right;
+}
+
+.admin_board_addBtn, .ctgDelBtn, .ctgUpdBtn{
+	font-size : 13px;
+	border : 0;
+	cursor : pointer;
+	background-color : transparent;
+	font-family : 'IBM Plex Sans KR', sans-serif;
+}
+
+.admin_board_addBtn:hover, .ctgDelBtn:hover, .ctgUpdBtn:hover{
+	font-weight : bold;
+}
+
+.ctgUpBtn, .ctgDownBtn{
+	font-size : 11px;
+	border : 0;
+	cursor : pointer;
+	background-color : transparent;
+	font-family : 'IBM Plex Sans KR', sans-serif;
+}
+
+.eCtgDiv:hover{
+	background-color : #3275A214;
+}

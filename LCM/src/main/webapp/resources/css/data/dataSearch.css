@@ -1,0 +1,463 @@
+@charset "UTF-8";
+
+.dataConDiv{
+	width : 900px;
+	margin : 0 auto;
+}
+
+.dataSearch_title{
+	width : 100%;
+	margin-top : 10px;
+	height : 40px;
+	text-align : center;
+}
+
+.idTxt{
+	width : 190px;
+	height : 30px;
+	padding-left : 20px;
+}
+
+.dataSearch_title img{
+	width : 22px;
+    vertical-align : middle;
+    cursor : pointer;
+}
+
+.dataSearch_menu{
+	width : 200px;
+	height : 20px;
+	position : absolute;
+	display : none;
+}
+
+.dataSearch_con_blank{
+	width : 100%;
+	margin-top : 30px;
+	height : 553px;
+    background-color: #3275A214;
+}
+
+.dataSearch_con_total{
+	width : 100%;
+	margin-top : 30px;
+	height : 553px;
+    background-color: #3275A214;
+	display : none;
+}
+
+.dataSearch_con_data{
+	width : 100%;
+	margin-top : 30px;
+	height : 568px;
+	background-color: #3275A214;
+    display : none;
+}
+
+.dataSubMenuBtn{
+	font-size : 13px;
+	border : 0;
+	cursor : pointer;
+	background-color : transparent;
+}
+
+.dataSubMenuBtn_select{
+	font-weight : bold;
+	color : #3275A2;
+}
+
+.dataSubMenuBtn:hover{
+	font-weight : bold;
+	color : #3275A2;
+}
+
+.totalDiv_left{
+	width : 350px;
+	height : 553px;
+	vertical-align : top;
+	display : inline-block;
+}
+
+.totalDiv_left_top{
+	width : 320px;
+	height : 170px;
+	margin-left : 15px;
+	margin-top : 15px;
+	border : 1px solid lightgray;
+	border-radius : 3px;
+	background-color : white;
+}
+
+.totalDiv_left_bot{
+	width : 320px;
+	height : 335px;
+	margin-left : 15px;
+	margin-top : 15px;
+	border : 1px solid lightgray;
+	border-radius : 3px;
+	background-color : white;
+}
+
+.totalDiv_right{
+	width : 546px;
+	height : 553px;
+	vertical-align : top;
+	display : inline-block;
+}
+
+.totalDiv_left_top_id{
+	margin-top : 15px;
+	margin-left : 15px;
+	width : 290px;
+	height : 25px;
+	font-size: 20px;
+	font-weight : bold;
+}
+
+.totalDiv_left_top_elo{
+	margin-top : 10px;
+	margin-left : 15px;
+	width : 290px;
+	height : 25px;
+}
+
+.totalDiv_left_top_totWrate
+,.totalDiv_left_top_mainWrate
+,.totalDiv_left_top_subWrate{
+	margin-top : 5px;
+	margin-left : 15px;
+	width : 290px;
+	height : 25px;
+}
+
+.totalDiv_left_bot_hang{
+	margin-top : 12px;
+	margin-left : 15px;
+	width : 290px;
+	height : 50px;
+	border : 1px solid lightgray;
+	border-radius : 6px;
+}
+
+.totalDiv_left_bot_l{
+	width : 50px;
+	height : 50px;
+	display : inline-block;
+}
+
+.totalDiv_left_bot_l img{
+	width : 50px;
+	height : 50px;
+}
+
+.totalDiv_left_bot_m{
+	margin-left : 15px;
+	width : 125px;
+	height : 50px;
+	display : inline-block;
+	vertical-align : top;
+}
+
+.totalDiv_left_bot_m_top{
+	width : 100%;
+	margin-top : 8px;
+	height : 20px;
+}
+
+.totalDiv_left_bot_m_bot{
+	width : 100%;
+	margin-top : 2px;
+	height : 10px;
+	font-size : 13px;
+}
+
+.totalDiv_left_bot_r{
+	margin-right : 15px;
+	width : 85px;
+	height : 50px;
+	display : inline-block;
+	vertical-align : top;
+}
+
+.totalDiv_left_bot_r_top{
+	width : 100%;
+	margin-top : 8px;
+	height : 15px;
+	text-align : right;
+	font-weight : bold;
+	font-size : 17px;
+}
+
+.totalDiv_left_bot_r_bot{
+	width : 100%;
+	margin-top : 5px;
+	height : 10px;
+	text-align : right;
+	font-size : 13px;
+}
+
+.totalDiv_right_list{
+	width : 528px;
+	height : 492px;
+	margin-top : 15px;
+	border : 1px solid lightgray;
+	border-radius : 3px;
+	background-color : white;	
+}
+
+.totalDiv_right_list_hang{
+	width : 484px;
+	height : 68px;
+	margin-left : 20px;
+	margin-top : 10px;
+	border-radius : 3px;
+}
+
+.totalDiv_right_list_blank{
+	width : 484px;
+	height : 68px;
+	margin-left : 20px;
+	margin-top : 10px;
+	border-radius : 3px;
+	border : 1px solid #D3D3D3D1;
+	background-color : #D3D3D3D1;
+}
+
+.dataList_l{
+	width : 60px;
+	height : 60px;
+	margin-left : 10px;
+	margin-top : 4px;
+	display : inline-block;
+}
+
+.dataList_l img{
+	width : 60px;
+	height : 60px;
+	border-radius : 10px;
+}
+
+.dataList_m{
+	width : 176px;
+	height : 60px;
+	margin-left : 10px;
+	margin-top : 4px;
+	display : inline-block;
+	vertical-align : top;
+}
+
+.dataList_m_top{
+	width : 100%;
+	height : 20px;
+	margin-top : 10px;
+}
+
+.dataList_m_bot{
+	width : 100%;
+	height : 15px;
+	margin-top : 7px;
+	font-size : 15px;
+	font-weight : bold;
+}
+
+.dataList_r{
+	width : 177px;
+	height : 60px;
+	margin-left : 10px;
+	margin-top : 4px;
+	display : inline-block;
+	vertical-align : top;
+}
+
+.dataList_r_top{
+	width : 100%;
+	height : 20px;
+	margin-top : 10px;
+	text-align : right;
+	font-size : 17px;
+	font-weight : bold;
+}
+
+.dataList_r_bot{
+	width : 100%;
+	height : 20px;
+	margin-top : 5px;
+	text-align : right;
+	font-size : 17px;
+	font-weight : bold;
+}
+
+.dataList_btn{
+	width : 20px;
+	height : 60px;
+	margin-left : 10px;
+	margin-top : 4px;
+	display : inline-block;
+	vertical-align : top;
+	text-align : center;
+	line-height: 4.5;
+	cursor : pointer;
+}
+
+.totalDiv_right_pb{
+	width : 528px;
+	margin-top : 8px;
+	height : 25px;
+	text-align : center;
+}
+
+.gamePgNBtn{
+	font-size : 13px;
+	border : 0;
+	cursor : pointer;
+	background-color : transparent;
+	font-family : 'IBM Plex Sans KR', sans-serif;
+}
+
+.gamePgNBtn:hover{
+	font-weight : bold;
+}
+
+.dataDiv_left{
+	width : 270px;
+	margin-left : 21px;
+	height : 553px;
+	vertical-align : top;
+	display : inline-block;
+}
+
+.dataDiv_left_top{
+	width: 100%;
+    height: 20px;
+    font-size: 16px;
+    font-weight : bold;
+    margin-top: 20px;
+}
+
+.dataDiv_left_list, .dataDiv_mid_list, .dataDiv_right_list{
+	width : 100%;
+	height : 491px;
+}
+
+.dataDiv_left_list_hang{
+	margin-top : 10px;
+	width : 100%;
+	height : 50px;
+	border : 1px solid lightgray;
+	border-radius : 6px;
+	background-color : white;
+}
+
+.dataDiv_left_bot_l{
+	width : 50px;
+	height : 50px;
+	display : inline-block;
+}
+
+.dataDiv_left_bot_l img{
+	width : 50px;
+	height : 50px;
+}
+
+.dataDiv_left_bot_m{
+	margin-left : 15px;
+	width : 100px;
+	height : 50px;
+	display : inline-block;
+	vertical-align : top;
+}
+
+.dataDiv_left_bot_m_top{
+	width : 100%;
+	margin-top : 8px;
+	height : 20px;
+}
+
+.dataDiv_left_bot_m_bot{
+	width : 100%;
+	margin-top : 2px;
+	height : 10px;
+	font-size : 13px;
+}
+
+.dataDiv_left_bot_r{
+	margin-right : 10px;
+	width : 95px;
+	height : 50px;
+	display : inline-block;
+	vertical-align : top;
+}
+
+.dataDiv_left_bot_r_top{
+	width : 100%;
+	margin-top : 8px;
+	height : 15px;
+	text-align : right;
+	font-weight : bold;
+	font-size : 17px;
+}
+
+.dataDiv_left_bot_r_bot{
+	width : 100%;
+	margin-top : 5px;
+	height : 10px;
+	text-align : right;
+	font-size : 13px;
+}
+
+.dataDiv_left_pb, .dataDiv_mid_pb, .dataDiv_right_pb{
+	text-align : center;
+}
+
+.dataDiv_mid{
+	width : 270px;
+	margin-left : 21px;
+	height : 553px;
+	vertical-align : top;
+	display : inline-block;
+}
+
+.dataDiv_mid_top{
+	width: 100%;
+    height: 20px;
+    font-size: 16px;
+    font-weight : bold;
+    margin-top: 20px;
+}
+
+.dataDiv_right{
+	width : 270px;
+	margin-left : 21px;
+	height : 553px;
+	vertical-align : top;
+	display : inline-block;
+}
+
+.dataDiv_right_top{
+	width: 100%;
+    height: 20px;
+    font-size: 16px;
+    font-weight : bold;
+    margin-top: 20px;
+}
+
+.dataDiv_left_list_blank{
+	margin-top : 10px;
+	width : 100%;
+	height : 50px;
+	border : 1px solid lightgray;
+	background-color : #D3D3D3D1;	
+	border-radius : 6px;
+}
+
+.game1PgNBtn, .game2PgNBtn, .game3PgNBtn{
+	font-size : 13px;
+	border : 0;
+	cursor : pointer;
+	background-color : transparent;
+	font-family : 'IBM Plex Sans KR', sans-serif;
+}
+
+.game1PgNBtn:hover, .game2PgNBtn:hover, .game3PgNBtn:hover{
+	font-weight : bold;
+}

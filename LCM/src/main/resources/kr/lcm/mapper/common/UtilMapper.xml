@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.lcm.mapper.common.UtilMapper">
+ 	
+<insert id="insertLog">
+INSERT INTO LOG (
+                  CTG
+                , WDATE
+                , EMAIL
+                , NOTE
+                ) 
+         VALUES (
+                  #{ctg}
+                , NOW()
+                , #{email}
+                , #{note}
+                )
+</insert>
+
+<select id="checkClan" parameterType="hashMap" resultType="hashMap">
+  SELECT A.AUTH AS AUTH
+    FROM ACCOUNT A
+   WHERE A.EMAIL = #{email}
+</select>
+
+<select id="checkClanNick" parameterType="hashMap" resultType="hashMap">
+  SELECT 'DUPLICATE' AS FLG
+    FROM ACCOUNT A
+   WHERE A.CLAN = #{clan}
+     AND A.NICK = #{nick}
+UNION ALL 
+  SELECT 'WITHDRAW' AS FLG
+    FROM ACCOUNT_WITHDRAW A
+   WHERE A.EMAIL = #{email}
+     AND A.CLAN  = #{clan}
+</select>
+
+<select id="getSessionNick" parameterType="hashMap" resultType="hashMap">
+  SELECT A.EMAIL AS EMAIL
+       , A.NICK  AS NICK
+    FROM ACCOUNT A
+   WHERE A.EMAIL = #{email}
+     AND A.CLAN = getClan(#{email})
+</select>
+ 
+</mapper>

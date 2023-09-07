@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.lcm.mapper.board.BoardMapper">
+
+<select id="boardCtgList" parameterType="hashMap" resultType="hashMap">
+  SELECT A.NO AS NO
+       , A.NM AS NM
+    FROM BOARD_CTG A
+   WHERE A.CLAN = getClan(#{email})
+ORDER BY A.SORT ASC
+</select>
+
+<select id="boardDocCnt" parameterType="hashMap" resultType="int">
+  SELECT COUNT(*) AS CNT
+    FROM (
+          SELECT getNick(A.WRITER, #{email}) AS NICK
+               , A.TITLE                     AS TITLE
+            FROM BOARD_DOC A
+           WHERE A.CLAN   = getClan(#{email})
+             AND A.CTG    = #{ctgNo}
+             AND A.DEL_YN = 'N'
+         ) DOC
+	 WHERE 1=1
+<if test="searchTxt != null and searchTxt !=''">
+	<if test="searchFlg == 0">
+     AND DOC.TITLE LIKE #{searchTxt}
+	</if>
+	<if test="searchFlg == 1">
+     AND DOC.NICK LIKE #{searchTxt}
+	</if>
+</if>
+</select>
+
+<select id="boardDocList" parameterType="hashMap" resultType="hashMap">
+  SELECT RES.NO                                   AS NO
+       , RES.TITLE                                AS TITLE
+       , RES.NICK                                 AS NICK
+       , DATE_FORMAT(RES.WDATE, '%y-%m-%d %H:%i') AS WDATE
+    FROM (
+          SELECT DOC.NO    AS NO
+               , DOC.TITLE AS TITLE
+               , DOC.NICK  AS NICK
+               , DOC.WDATE AS WDATE
+               , ROW_NUMBER() OVER(ORDER BY DOC.WDATE DESC) AS RNK
+            FROM (
+                  SELECT getNick(A.WRITER, #{email}) AS NICK
+                       , A.TITLE                     AS TITLE
+                       , A.WDATE                     AS WDATE
+                       , A.NO                        AS NO
+                    FROM BOARD_DOC A
+                   WHERE A.CLAN   = getClan(#{email})
+                     AND A.CTG    = #{ctgNo}
+                     AND A.DEL_YN = 'N'
+                 ) DOC
+	       WHERE 1=1
+	     <if test="searchTxt != null and searchTxt !=''">
+	        <if test="searchFlg == 0">
+             AND DOC.TITLE LIKE #{searchTxt}
+        	</if>
+        	<if test="searchFlg == 1">
+             AND DOC.NICK LIKE #{searchTxt}
+        	</if>
+        </if>
+	     ) RES
+   WHERE RES.RNK BETWEEN #{startCnt} AND #{endCnt}
+</select>
+
+<insert id="boardWrite">
+INSERT INTO BOARD_DOC (
+                        CLAN
+                      , CTG
+                      , TITLE
+                      , CON
+                      , WRITER
+                      , WDATE
+                      )
+               VALUES (
+                        getClan(#{email})
+                      , #{boardCtg}
+                      , #{boardTitle}
+                      , #{boardCon}
+                      , #{email}
+                      , NOW()
+                      )
+</insert>
+
+<select id="getDrawBoardDoc" parameterType="hashMap" resultType="hashMap">
+  SELECT A.NO                                     AS NO
+       , A.TITLE                                  AS TITLE
+       , A.CON                                    AS CON
+       , getNick(A.WRITER, #{email})              AS NICK
+       , DATE_FORMAT(A.WDATE, '%y-%m-%d %H:%i')   AS WDATE
+       , CASE WHEN A.WRITER = #{email} THEN 'PR' 
+              WHEN (SELECT E.AUTH FROM ACCOUNT E WHERE E.EMAIL = #{email}) IN (2, 3) THEN 'P'
+		        ELSE 'F' END                      AS CRUD_FLG
+    FROM BOARD_DOC A
+   WHERE A.CLAN = getClan(#{email})
+     AND A.NO = #{boardNo}
+     AND A.CTG = #{boardCtg}
+     AND A.DEL_YN = 'N'
+</select>
+
+<insert id="writeReple">
+INSERT INTO BOARD_REP (
+                        DOC
+                      , CLAN
+                      , CTG
+                      , CON
+                      , WRITER
+                      , WDATE
+                      )
+               VALUES (
+                        #{boardNo}
+                      , getClan(#{email})
+                      , #{boardCtg}
+                      , #{boardReple}
+                      , #{email}
+                      , NOW()
+                      )
+</insert>
+ 
+<select id="boardRepleCnt" parameterType="hashMap" resultType="int">
+  SELECT COUNT(*) AS CNT
+    FROM BOARD_REP A
+   WHERE A.DOC = #{boardNo}
+     AND A.CLAN = getClan(#{email})
+     AND A.CTG = #{boardCtg}
+     AND A.DEL_YN = 'N'
+</select>
+ 
+<select id="boardRepleList" parameterType="hashMap" resultType="hashMap">
+  SELECT REP.NO
+       , REP.CON
+       , REP.NICK
+       , REP.WDATE
+       , REP.CRUD_FLG
+    FROM (
+          SELECT A.NO                                       AS NO
+               , A.CON                                      AS CON
+               , getNick(A.WRITER, #{email})                AS NICK
+        	   , DATE_FORMAT(A.WDATE, '%y-%m-%d %H:%i')     AS WDATE
+               , CASE WHEN A.WRITER = #{email} THEN 'P' 
+                      WHEN (SELECT E.AUTH FROM ACCOUNT E WHERE E.EMAIL = #{email}) IN (2, 3) THEN 'P'
+        		        ELSE 'F' END                      AS CRUD_FLG
+        		   , ROW_NUMBER() OVER(ORDER BY A.WDATE ASC) AS RNK
+            FROM BOARD_REP A
+           WHERE A.DOC = #{boardNo}
+             AND A.CLAN = getClan(#{email})
+             AND A.CTG = #{boardCtg}
+             AND A.DEL_YN = 'N'
+         ) REP
+   WHERE REP.RNK BETWEEN #{startCnt} AND #{endCnt}
+</select>
+
+<update id="delRep">
+  UPDATE BOARD_REP A
+     SET A.DEL_YN = 'Y'
+   WHERE A.NO = #{delRepNo}
+     AND A.CLAN = getClan(#{email})
+     AND A.DOC= #{boardNo}
+     AND A.CTG= #{boardCtg}
+     AND A.DEL_YN = 'N'
+</update>
+
+<update id="delDoc">
+  UPDATE BOARD_DOC A
+     SET A.DEL_YN = 'Y'
+   WHERE A.NO = #{boardNo}
+     AND A.CLAN = getClan(#{email})
+     AND A.CTG= #{boardCtg}
+     AND A.DEL_YN = 'N'
+</update>
+
+<update id="delDocRep">
+  UPDATE BOARD_REP A
+     SET A.DEL_YN = 'Y'
+   WHERE A.CLAN = getClan(#{email})
+     AND A.DOC= #{boardNo}
+     AND A.CTG= #{boardCtg}
+     AND A.DEL_YN = 'N'
+</update>
+
+<update id="boardUpdate">
+  UPDATE BOARD_DOC A
+     SET A.TITLE = #{boardTitle}
+       , A.CON = #{boardCon}
+   WHERE A. NO = #{boardNo}
+     AND A.CLAN = getClan(#{email})
+     AND A.CTG= #{boardCtg}
+     AND A.WRITER = #{email}
+     AND A.DEL_YN = 'N'
+</update>
+
+</mapper>

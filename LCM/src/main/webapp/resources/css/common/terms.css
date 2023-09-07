@@ -1,0 +1,23 @@
+@charset "UTF-8";
+@import "/resources/css/layout/setting.css";
+
+.termsTitleDiv{
+	width : 460px;
+	height : 40px;
+	font-family : 'IBM Plex Sans KR', sans-serif;
+    font-size : 16px;
+    font-weight : bold;
+    line-height : 2.5;
+    text-align : center;
+    margin : 0 auto;
+    color : #3275A2;
+}
+
+.termsContentDiv{
+	padding : 10px;
+	width : 460px;
+	font-family : 'IBM Plex Sans KR', sans-serif;
+    font-size : 14px;
+    border : 1px solid lightgray;
+    margin : 0 auto;
+}

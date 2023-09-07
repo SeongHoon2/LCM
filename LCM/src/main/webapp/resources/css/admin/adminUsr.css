@@ -1,0 +1,103 @@
+@charset "UTF-8";
+
+.adminUsrDiv{
+	width: 1200px;
+    margin: 0 auto;
+	margin-top : 20px;
+}
+
+.adminUsrConDiv{
+	margin-left : 298px;
+	width : 600px;
+	height : 600px;
+	border-top : 1px solid lightgray;
+	border-left : 1px solid lightgray;
+	border-right : 1px solid lightgray;
+	text-align : center;
+}
+
+.adminUsrBtnDiv{
+	margin-left : 298px;
+	width : 600px;
+	height : 25px;
+	margin-top : 8px;
+	text-align : center;
+}
+
+.adminUsr_btn{
+	margin-top: 10px;
+}
+
+.adminUsrConDiv_title_div{
+	height: 30px;
+	background-color : #3275A2;
+	color : white;
+	font-weight : bold;
+	display : inline-block;
+	vertical-align : top;
+	line-height : 2; 
+}
+
+.adminUsrConDiv_con_div{
+	height: 37px;
+    display: inline-block;
+    vertical-align: top;
+    line-height: 3;
+    font-size: 13px; 
+    border-bottom: 1px solid lightgray;
+}
+
+.usrDelBtn, .usrAuthBtn, .usrBanBtn{
+	border : 0;
+	cursor : pointer;
+	background-color : white;
+	font-family : 'IBM Plex Sans KR', sans-serif;
+	background-color : transparent;
+}
+
+.usrAuthBtn:hover, .adminPgNBtn:hover, .usrDelBtn:hover, .usrBanBtn:hover {
+	font-weight : bold;
+}
+
+.adminPgNBtn{
+	font-size : 13px;
+	border : 0;
+	cursor : pointer;
+	background-color : white;
+	font-family : 'IBM Plex Sans KR', sans-serif;
+}
+
+.adminUsr_write{
+	position: absolute;
+    width: 80px;
+    height: 20px;
+    margin-top: -18px;
+    text-align : left;
+    font-weight : bold;
+}
+
+.adminUsr_searchDiv{
+	position: absolute;
+    width: 252px;
+    height: 20px;
+    margin-top: -21px;
+    margin-left: 400px;
+    font-family : 'IBM Plex Sans KR', sans-serif;
+}
+
+.adminUsr_search{
+	padding-left : 6px;
+	width : 124px;
+	height : 20px;
+	font-size : 12px;
+}
+
+.adminUsr_searchBtn{
+	width : 14px;
+	cursor : pointer;
+	vertical-align : middle;
+}
+
+.adminUsr_divHover:hover{
+	background-color : #3275A214;
+}

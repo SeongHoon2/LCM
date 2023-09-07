@@ -1,0 +1,102 @@
+@charset "UTF-8";
+
+
+.boardConDiv_docTitle{
+	width : 100%;
+	border-bottom : 1px solid lightgray;
+}
+
+.boardConDiv_docTitle_l{
+	width : 816px;
+	font-size: 13px;
+    line-height: 1.5;
+	display : inline-block;
+}
+
+.boardConDiv_docTitle_r{
+	vertical-align : bottom;
+	width : 100px;
+	padding-bottom : 10px;
+	text-align : right;
+	display : inline-block;
+}
+
+.boardConDiv_docDoc{
+	width : 100%;
+	min-height : 510px;
+	padding-top : 10px;
+	padding-bottom : 10px;
+	border-bottom : 1px solid lightgray;
+}
+
+.boardDocWriReple{
+	width : 100%;
+	height : 73px;
+	padding-top : 10px;
+	padding-bottom : 10px;
+}
+
+.repleTxt{
+	padding : 10px;
+	width : 900px;
+	height : 35px;
+	resize : none;
+	overflow : hidden;
+	font-size : 12px;
+}
+
+.repltWriBtn{
+	font-size : 13px;
+	border : 0;
+	cursor : pointer;
+	background-color : white;
+	margin-top: 5px;
+    margin-left: 880px;
+}
+
+.repltWriBtn:hover{
+	font-weight : bold;
+}
+
+.repleDiv_repDoc{
+	width : 100%;
+	padding-top : 5px;
+	padding-bottom : 5px;
+	min-height : 45px;
+	font-size : 13px;
+	overflow : none;
+	border-bottom : 1px solid lightgray;
+	
+}
+
+.repleDiv_pg{
+	padding-top: 10px;
+	text-align : center;
+}
+
+.replePgNBtn{
+	font-size : 12px;
+	border : 0;
+	cursor : pointer;
+	background-color : white;
+	font-family : 'IBM Plex Sans KR', sans-serif;	
+}
+
+.repDelBtn{
+	width : 11px;
+	cursor : pointer;
+	vertical-align: middle;
+}
+
+
+.docTitleBtn{
+	font-size : 13px;
+	border : 0;
+	cursor : pointer;
+	background-color : white;
+	font-family : 'IBM Plex Sans KR', sans-serif;
+}
+
+.docTitleBtn:hover{
+	font-weight : bold;
+}

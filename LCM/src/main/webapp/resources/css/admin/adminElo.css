@@ -1,0 +1,245 @@
+@charset "UTF-8";
+
+.adminEloConDiv{
+	width: 900px;
+    margin: 0 auto;
+	margin-top : 20px;
+}
+
+.adminEloUsrDiv{
+	width : 300px;
+	height : 600px;
+	display : inline-block;
+	margin-left : 20px;
+	border : 0;
+	text-align : center;
+	vertical-align : top;
+}
+
+.adminEloUsrDiv_top{
+	width : 100%;
+	height : 50px;
+}
+
+.searchNickTxt{
+	width : 254px;
+	padding-left : 10px;
+	padding-right : 10px;
+	height : 30px;
+}
+
+.adminEloUsrDiv_top img{
+	width : 15px;
+	vertical-align : middle;
+	cursor : pointer;
+}
+
+.adminEloUsrDiv_list{
+	width : 100%;
+	height : 510px;
+    border-left: 1px solid lightgray;
+    border-right: 1px solid lightgray;
+    text-align : center;
+}
+
+.adminEloUsrDiv_list_title{
+	width : 100%;
+	height : 30px;
+	background-color : #3275A2;
+	color : white;
+	font-weight: bold;
+    line-height: 2;
+    border : 1px solid #3275A2;
+}
+
+.titleTr{
+	background-color : #3275A2;
+	color : white;
+	font-weight: bold;
+    border : 1px solid #3275A2;
+    line-height: 2;
+	height : 30px;
+}
+
+.adminEloUsrDiv_list table{
+	width : 100%;
+	height : 100%;
+}
+
+.usrTr{
+	width : 100%;
+	height : 30px;
+	border-bottom : 1px solid lightgray;
+	cursor : pointer;
+	font-size : 13px;
+}
+
+.blankUsrTr{
+	width : 100%;
+	height : 30px;
+	border-bottom : 1px solid lightgray;
+	font-size : 13px;
+}
+
+.selectUsrTr{
+	width : 100%;
+	height : 30px;
+	background-color : #3275A214;
+	cursor : pointer;
+	font-size : 13px;
+	border-bottom : 1px solid lightgray;
+}
+
+.eloTr, .blankEloTr{
+	width : 100%;
+	height : 30px;
+	border-bottom : 1px solid lightgray;
+	font-size : 12px;
+}
+
+.adminEloUsrDiv_list table th, .blankUsrTr th, .blankEloTr th, .eloTr th, .eloTr td{
+	vertical-align : middle;
+}
+
+.usrTr:hover{
+	 background-color : #3275A214;
+}
+
+.adminEloUsrDiv_pg{
+	width: 100%;
+    height: 25px;
+    margin-top: 10px;
+}
+
+.adminEloDocDiv{
+	width : 540px;
+	height : 600px;
+	display : inline-block;
+	margin-left : 20px;
+	border : 0;
+	vertical-align : top;
+}
+
+.eloHistDiv_empty{
+	width : 100%;
+	height : 455px;
+	border-radius : 3px;
+	background-color : #3275A242;
+}
+
+.eloHistDiv_list{
+	width : 100%;
+	height : 420px;
+	border-left : 1px solid lightgray;
+	border-right : 1px solid lightgray;
+}
+
+.eloHistDiv_list table{
+	width : 100%;
+}
+
+.eloWriteDiv{
+	width : 100%;
+	height : 126px;
+	margin-top : 10px;
+	border-radius : 3px;
+	border : 1px solid lightgray;
+}
+
+.adminPgNBtn, .adminEloPgNBtn{
+	font-size : 13px;
+	border : 0;
+	cursor : pointer;
+	background-color : white;
+	font-family : 'IBM Plex Sans KR', sans-serif;
+}
+
+.adminPgNBtn:hover, .adminEloPgNBtn:hover{
+	font-weight : bold;
+}
+
+.eloHistDiv_pg{
+	width : 100%;
+	height : 25px;
+	margin-top : 10px;
+	text-align : center;
+}
+
+.eloWriteDiv_txtDiv{
+	width: 400px;
+    height: 60px;
+    margin-left: 70px;
+    margin-top: 20px;
+}
+
+.eloWriteDiv_txtDiv_l{
+	display : inline-block;
+	width : 50px;
+	height : 100%;
+}
+
+.eloWriteDiv_txtDiv_l_t{
+	width : 100%;
+	height : 20px;
+	margin-top : 5px;
+	margin-bottom : 5px;
+	text-align : center;
+}
+
+.eloWriteDiv_txtDiv_l_b{
+	width : 100%;
+	height : 20px;
+	margin-top : 5px;
+	text-align : center;
+}
+
+.eloWriteDiv_txtDiv_m{
+	display : inline-block;
+	width : 50px;
+	height : 100%;
+	vertical-align : middle;
+}
+
+.scoreTxt{
+	width : 30px;
+	height : 26px;
+	text-align : center;
+}
+
+.eloWriteDiv_txtDiv_r{
+	display : inline-block;
+	width : 293px;
+	height : 100%;
+	vertical-align : middle;
+}
+
+.noteTxt{
+	width : 280px;
+	height : 26px;
+	padding-left : 10px;
+}
+
+.eloWriteDiv_btnDiv{
+	width: 400px;
+    height: 30px;
+    margin-left: 70px;
+    text-align : center;
+}
+
+.refBtn{
+	border: 0;
+    cursor: pointer;
+    background-color: transparent;
+    font-size: 12px;
+}
+
+.refBtn:hover{
+	font-weight : bold;
+}
+
+.eloWriteDiv_refDiv{
+	width: 540px;
+    height: 20px;
+    text-align: right;
+    margin-top: 7px;
+}

@@ -1,0 +1,122 @@
+@charset "UTF-8";
+
+.adminLogoDiv{
+	width: 1200px;
+    margin: 0 auto;
+	margin-top : 20px;
+}
+
+.adminLogo_conDiv{
+	margin-left : 420px;
+	margin-top : 22px;
+	width : 360px;
+	height : 180px;
+	text-align : center;
+}
+
+.adminLogo_topDiv{
+	margin-top : 20px;
+	width : 180px;
+	margin-left : 90px;
+	height : 20px;
+	text-align : left;
+	font-weight : bold;
+}
+
+.adminLogo_midDiv{
+	margin-top : 5px;
+	width : 180px;
+	margin-left : 90px;
+	height : 120px;
+	margin-bottom : 10px;
+	border : 1px solid lightgray;
+}
+
+.adminLogo_midDiv img{
+	width : 180px;
+	height : 120px;
+}
+
+.adminLogo_botDiv{
+	width : 100%;
+	height : 30px;
+}
+
+
+.admin_logo_addBtn{
+	font-size : 13px;
+	border : 0;
+	cursor : pointer;
+	background-color : transparent;
+	font-family : 'IBM Plex Sans KR', sans-serif;
+}
+
+.admin_logo_addBtn:hover{
+	font-weight : bold;
+}
+
+.adminLogoHistDiv{
+	width: 1200px;
+    margin: 0 auto;
+	margin-top : 20px;
+}
+.adminLogoHistConDiv{
+	margin-left : 298px;
+	width : 600px;
+	height : 371px;
+	border-top : 1px solid lightgray;
+	border-left : 1px solid lightgray;
+	border-right : 1px solid lightgray;
+	text-align : center;
+}
+
+.adminLogoHistBtnDiv{
+	margin-left : 298px;
+	width : 600px;
+	height : 25px;
+	margin-top : 12px;
+	text-align : center;
+}
+
+.adminLogoHistConDiv_title_div{
+	height: 30px;
+	background-color : #3275A2;
+	color : white;
+	font-weight : bold;
+	display : inline-block;
+	vertical-align : top;
+	line-height : 2; 
+}
+
+.adminLogoHistConDiv_con_div{
+	height: 37px;
+    display: inline-block;
+    vertical-align: top;
+    font-size: 13px; 
+    border-bottom: 1px solid lightgray;
+    line-height : 3;
+}
+
+.clanlogoHistPgNbtn{
+	font-size : 13px;
+	border : 0;
+	cursor : pointer;
+	background-color : white;
+	font-family : 'IBM Plex Sans KR', sans-serif;
+}
+
+.clanlogoHistPgNbtn:hover{
+	font-weight : bold;
+}
+
+.adminLogoHist_divHover:hover{
+	background-color : #3275A214;
+}
+
+.adminLogoHistDiv_t{
+	margin-left: 298px;
+    width: 600px;
+    height: 20px;
+    text-align: left;
+    font-weight: bold;	
+}

@@ -1,0 +1,408 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.lcm.mapper.game.GameMapper">
+
+<insert id="makeGame">
+INSERT INTO CW (
+                 CLAN
+               , NAME
+               , WDATE
+               , GDATE
+               , REG_FLG
+               , WRITER
+               )
+        VALUES (
+                 getClan(#{sEmail})
+               , #{gm_NM}
+               , NOW()
+               , STR_TO_DATE(#{gm_DATE}, '%Y-%m-%d %H:%i')
+               , #{gm_GUBUN}
+               , #{sEmail}
+               )
+</insert>
+
+<select id="getGameMakeMenu" parameterType="hashMap" resultType="hashMap">
+  SELECT RES.NAME    AS NAME
+       , RES.WDATE   AS WDATE
+       , RES.REF_FLG AS REF_FLG
+       , RES.REG_FLG AS REG_FLG
+       , RES.NICK    AS NICK
+    FROM (      
+          SELECT A.NAME                                             AS NAME
+               , DATE_FORMAT(A.GDATE, '%y-%m-%d %H:%i')             AS WDATE
+               , CASE WHEN A.REF_FLG = 0 THEN '미반영' ELSE '반영' END  AS REF_FLG
+               , CASE WHEN A.REG_FLG = 0 THEN '공식'  ELSE '사설' END  AS REG_FLG
+               , getNick(A.WRITER, #{email})                        AS NICK
+               , ROW_NUMBER() OVER(ORDER BY A.GDATE DESC)           AS RNK
+            FROM CW A
+           WHERE A.CLAN = getClan(#{email})
+             AND A.DEL_YN = 'N'
+         ) RES
+   WHERE RES.RNK BETWEEN 1 AND 5
+</select>
+
+<select id="gameInsCnt" parameterType="hashMap" resultType="int">
+  SELECT COUNT(*) AS CNT
+    FROM CW A
+   WHERE A.CLAN = getClan(#{sEmail})
+     AND A.REF_FLG = 0
+     AND DATE_FORMAT(A.GDATE,'%Y-%m') = #{ym}
+     AND A.DEL_YN = 'N'
+</select>
+
+<select id="gameInsList" parameterType="hashMap" resultType="hashMap">
+  SELECT RES.NO
+       , RES.NAME
+    FROM (
+          SELECT A.NO                                      AS NO
+               , A.NAME                                    AS NAME
+               , ROW_NUMBER() OVER(ORDER BY A.GDATE DESC)  AS RNK
+            FROM CW A
+           WHERE A.CLAN = getClan(#{sEmail})
+             AND A.REF_FLG = 0
+             AND DATE_FORMAT(A.GDATE,'%Y-%m') = #{ym}
+             AND A.DEL_YN = 'N'
+         ) RES
+   WHERE RES.RNK BETWEEN #{startCnt} AND #{endCnt}
+</select>
+
+<select id="getGameInsDocNo" parameterType="hashMap" resultType="hashMap">
+  SELECT RES.NO AS NO
+    FROM (
+          SELECT A.NO                                      AS NO
+               , ROW_NUMBER() OVER(ORDER BY A.GDATE DESC)  AS RNK
+            FROM CW A
+           WHERE A.CLAN = getClan(#{sEmail})
+             AND A.REF_FLG = 0 
+             AND DATE_FORMAT(A.GDATE,'%Y-%m') = #{ym}
+             AND A.DEL_YN = 'N'
+         ) RES
+   WHERE RES.RNK = 1
+</select>
+
+<select id="getGameInsDoc" parameterType="hashMap" resultType="hashMap">
+  SELECT A.NO                                                AS NO
+       , CASE WHEN A.REG_FLG = 0 THEN '정기' ELSE '수시' END    AS REG_FLG
+       , A.NAME                                              AS NAME
+       , DATE_FORMAT(A.WDATE, '%y-%m-%d %H:%i')              AS WDATE
+       , DATE_FORMAT(A.GDATE, '%y-%m-%d %H:%i')              AS GDATE
+       , getNick(A.WRITER, #{sEmail})                         AS WRITER
+       , A.WIN                                               AS WIN
+       , getNick(A.WIN_WRITER, #{sEmail})                     AS WIN_WRITER
+    FROM CW A
+   WHERE A.CLAN = getClan(#{sEmail})
+     AND A.REF_FLG = 0 
+     AND A.NO = #{no}
+     AND A.DEL_YN = 'N'
+</select>
+
+<select id="getGameInsDocList" parameterType="hashMap" resultType="hashMap">
+  SELECT getNick(A.B_1_EMAIL, #{sEmail})                      AS NICK
+       , A.B_1_CHAMP                                         AS CHAMP
+       , A.B_1_K                                             AS K
+       , A.B_1_D                                             AS D
+       , A.B_1_A                                             AS A
+       , getNick(A.B_1_WRITER, #{sEmail})                     AS WRITER
+    FROM CW A
+   WHERE A.CLAN = getClan(#{sEmail})
+     AND A.REF_FLG = 0
+     AND A.NO = #{no}
+     AND A.DEL_YN = 'N'   
+UNION ALL
+  SELECT getNick(C.B_2_EMAIL, #{sEmail})                      AS NICK
+       , C.B_2_CHAMP                                         AS CHAMP
+       , C.B_2_K                                             AS K
+       , C.B_2_D                                             AS D
+       , C.B_2_A                                             AS A
+       , getNick(C.B_2_WRITER, #{sEmail})                     AS WRITER
+    FROM CW C
+   WHERE C.CLAN = getClan(#{sEmail})
+     AND C.REF_FLG = 0
+     AND C.NO = #{no} 
+     AND C.DEL_YN = 'N'   
+UNION ALL
+  SELECT getNick(D.B_3_EMAIL, #{sEmail})                      AS NICK
+       , D.B_3_CHAMP                                         AS CHAMP
+       , D.B_3_K                                             AS K
+       , D.B_3_D                                             AS D
+       , D.B_3_A                                             AS A
+       , getNick(D.B_3_WRITER, #{sEmail})                     AS WRITER
+    FROM CW D
+   WHERE D.CLAN = getClan(#{sEmail})
+     AND D.REF_FLG = 0
+     AND D.NO = #{no} 
+     AND D.DEL_YN = 'N'   
+UNION ALL
+  SELECT getNick(E.B_4_EMAIL, #{sEmail})                      AS NICK
+       , E.B_4_CHAMP                                         AS CHAMP
+       , E.B_4_K                                             AS K
+       , E.B_4_D                                             AS D
+       , E.B_4_A                                             AS A
+       , getNick(E.B_4_WRITER, #{sEmail})                     AS WRITER
+    FROM CW E
+   WHERE E.CLAN = getClan(#{sEmail})
+     AND E.REF_FLG = 0
+     AND E.NO = #{no}  
+     AND E.DEL_YN = 'N'  
+UNION ALL
+  SELECT getNick(F.B_5_EMAIL, #{sEmail})                      AS NICK
+       , F.B_5_CHAMP                                         AS CHAMP
+       , F.B_5_K                                             AS K
+       , F.B_5_D                                             AS D
+       , F.B_5_A                                             AS A
+       , getNick(F.B_5_WRITER, #{sEmail})                     AS WRITER
+    FROM CW F
+   WHERE F.CLAN = getClan(#{sEmail})
+     AND F.REF_FLG = 0
+     AND F.NO = #{no} 
+     AND F.DEL_YN = 'N'   
+UNION ALL
+  SELECT getNick(G.R_1_EMAIL, #{sEmail})                      AS NICK
+       , G.R_1_CHAMP                                         AS CHAMP
+       , G.R_1_K                                             AS K
+       , G.R_1_D                                             AS D
+       , G.R_1_A                                             AS A
+       , getNick(G.R_1_WRITER, #{sEmail})                     AS WRITER
+    FROM CW G
+   WHERE G.CLAN = getClan(#{sEmail})
+     AND G.REF_FLG = 0
+     AND G.NO = #{no}   
+     AND G.DEL_YN = 'N' 
+UNION ALL
+  SELECT getNick(H.R_2_EMAIL, #{sEmail})                      AS NICK
+       , H.R_2_CHAMP                                         AS CHAMP
+       , H.R_2_K                                             AS K
+       , H.R_2_D                                             AS D
+       , H.R_2_A                                             AS A
+       , getNick(H.R_2_WRITER, #{sEmail})                     AS WRITER
+    FROM CW H
+   WHERE H.CLAN = getClan(#{sEmail})
+     AND H.REF_FLG = 0
+     AND H.NO = #{no}  
+     AND H.DEL_YN = 'N'  
+UNION ALL
+  SELECT getNick(I.R_3_EMAIL, #{sEmail})                      AS NICK
+       , I.R_3_CHAMP                                         AS CHAMP
+       , I.R_3_K                                             AS K
+       , I.R_3_D                                             AS D
+       , I.R_3_A                                             AS A
+       , getNick(I.R_3_WRITER, #{sEmail})                     AS WRITER
+    FROM CW I
+   WHERE I.CLAN = getClan(#{sEmail})
+     AND I.REF_FLG = 0
+     AND I.NO = #{no}   
+     AND I.DEL_YN = 'N' 
+UNION ALL
+  SELECT getNick(J.R_4_EMAIL, #{sEmail})                      AS NICK
+       , J.R_4_CHAMP                                         AS CHAMP
+       , J.R_4_K                                             AS K
+       , J.R_4_D                                             AS D
+       , J.R_4_A                                             AS A
+       , getNick(J.R_4_WRITER, #{sEmail})                     AS WRITER
+    FROM CW J
+   WHERE J.CLAN = getClan(#{sEmail})
+     AND J.REF_FLG = 0
+     AND J.NO = #{no}  
+     AND J.DEL_YN = 'N'  
+UNION ALL
+  SELECT getNick(K.R_5_EMAIL, #{sEmail})                      AS NICK
+       , K.R_5_CHAMP                                         AS CHAMP
+       , K.R_5_K                                             AS K
+       , K.R_5_D                                             AS D
+       , K.R_5_A                                             AS A
+       , getNick(K.R_5_WRITER, #{sEmail})                     AS WRITER
+    FROM CW K
+   WHERE K.CLAN = getClan(#{sEmail})
+     AND K.REF_FLG = 0
+     AND K.NO = #{no}  
+     AND K.DEL_YN = 'N'  
+</select>
+
+<select id="getGameInsUsrList" parameterType="hashMap" resultType="hashMap">
+  SELECT USR.EMAIL AS EMAIL
+       , USR.NICK  AS NICK
+    FROM (
+           SELECT A.EMAIL AS EMAIL
+                , A.NICK  AS NICK
+             FROM ACCOUNT A
+            WHERE A.CLAN = getClan(#{sEmail})
+         UNION ALL
+           SELECT 'DUMMY' AS EMAIL, '사용자 설정 데이터' AS NICK FROM DUAL
+         ) USR
+   WHERE 1=1
+<if test="nickSearchTxt != null and nickSearchTxt !=''">
+     AND USR.NICK LIKE #{nickSearchTxt}
+</if>
+</select>
+
+<select id="getChampList" parameterType="hashMap" resultType="hashMap">
+  SELECT A.NO
+       , A.NM
+    FROM CHAMP A
+   WHERE 1=1
+<if test="nickChampTxt != null and nickChampTxt !=''">
+     AND A.NM LIKE #{nickChampTxt}
+</if>
+</select>
+
+<update id="insGameData_B_1">
+UPDATE CW A
+   SET B_1_EMAIL = #{email}
+     , B_1_K = #{killTxt}
+     , B_1_D = #{deathTxt}
+     , B_1_A = #{assistTxt}
+     , B_1_CHAMP = #{champNo}
+     , B_1_WRITER = #{sEmail}
+     , B_1_WDATE = NOW()
+ WHERE A.NO = #{no}
+   AND A.CLAN = getClan(#{sEmail}) 
+   AND A.REF_FLG = 0
+   AND A.DEL_YN = 'N'
+</update>
+
+<update id="insGameData_B_2">
+UPDATE CW A
+   SET B_2_EMAIL = #{email}
+     , B_2_K = #{killTxt}
+     , B_2_D = #{deathTxt}
+     , B_2_A = #{assistTxt}
+     , B_2_CHAMP = #{champNo}
+     , B_2_WRITER = #{sEmail}
+     , B_2_WDATE = NOW()
+ WHERE A.NO = #{no}
+   AND A.CLAN = getClan(#{sEmail}) 
+   AND A.REF_FLG = 0
+   AND A.DEL_YN = 'N'
+</update>
+
+<update id="insGameData_B_3">
+UPDATE CW A
+   SET B_3_EMAIL = #{email}
+     , B_3_K = #{killTxt}
+     , B_3_D = #{deathTxt}
+     , B_3_A = #{assistTxt}
+     , B_3_CHAMP = #{champNo}
+     , B_3_WRITER = #{sEmail}
+     , B_3_WDATE = NOW()
+ WHERE A.NO = #{no}
+   AND A.CLAN = getClan(#{sEmail}) 
+   AND A.REF_FLG = 0
+   AND A.DEL_YN = 'N'
+</update>
+
+<update id="insGameData_B_4">
+UPDATE CW A
+   SET B_4_EMAIL = #{email}
+     , B_4_K = #{killTxt}
+     , B_4_D = #{deathTxt}
+     , B_4_A = #{assistTxt}
+     , B_4_CHAMP = #{champNo}
+     , B_4_WRITER = #{sEmail}
+     , B_4_WDATE = NOW()
+ WHERE A.NO = #{no}
+   AND A.CLAN = getClan(#{sEmail}) 
+   AND A.REF_FLG = 0
+   AND A.DEL_YN = 'N'
+</update>
+
+<update id="insGameData_B_5">
+UPDATE CW A
+   SET B_5_EMAIL = #{email}
+     , B_5_K = #{killTxt}
+     , B_5_D = #{deathTxt}
+     , B_5_A = #{assistTxt}
+     , B_5_CHAMP = #{champNo}
+     , B_5_WRITER = #{sEmail}
+     , B_5_WDATE = NOW()
+ WHERE A.NO = #{no}
+   AND A.CLAN = getClan(#{sEmail}) 
+   AND A.REF_FLG = 0
+   AND A.DEL_YN = 'N'
+</update>
+
+<update id="insGameData_R_1">
+UPDATE CW A
+   SET R_1_EMAIL = #{email}
+     , R_1_K = #{killTxt}
+     , R_1_D = #{deathTxt}
+     , R_1_A = #{assistTxt}
+     , R_1_CHAMP = #{champNo}
+     , R_1_WRITER = #{sEmail}
+     , R_1_WDATE = NOW()
+ WHERE A.NO = #{no}
+   AND A.CLAN = getClan(#{sEmail}) 
+   AND A.REF_FLG = 0
+   AND A.DEL_YN = 'N'
+</update>
+
+<update id="insGameData_R_2">
+UPDATE CW A
+   SET R_2_EMAIL = #{email}
+     , R_2_K = #{killTxt}
+     , R_2_D = #{deathTxt}
+     , R_2_A = #{assistTxt}
+     , R_2_CHAMP = #{champNo}
+     , R_2_WRITER = #{sEmail}
+     , R_2_WDATE = NOW()
+ WHERE A.NO = #{no}
+   AND A.CLAN = getClan(#{sEmail}) 
+   AND A.REF_FLG = 0
+   AND A.DEL_YN = 'N'
+</update>
+
+<update id="insGameData_R_3">
+UPDATE CW A
+   SET R_3_EMAIL = #{email}
+     , R_3_K = #{killTxt}
+     , R_3_D = #{deathTxt}
+     , R_3_A = #{assistTxt}
+     , R_3_CHAMP = #{champNo}
+     , R_3_WRITER = #{sEmail}
+     , R_3_WDATE = NOW()
+ WHERE A.NO = #{no}
+   AND A.CLAN = getClan(#{sEmail}) 
+   AND A.REF_FLG = 0
+   AND A.DEL_YN = 'N'
+</update>
+
+<update id="insGameData_R_4">
+UPDATE CW A
+   SET R_4_EMAIL = #{email}
+     , R_4_K = #{killTxt}
+     , R_4_D = #{deathTxt}
+     , R_4_A = #{assistTxt}
+     , R_4_CHAMP = #{champNo}
+     , R_4_WRITER = #{sEmail}
+     , R_4_WDATE = NOW()
+ WHERE A.NO = #{no}
+   AND A.CLAN = getClan(#{sEmail}) 
+   AND A.REF_FLG = 0
+   AND A.DEL_YN = 'N'
+</update>
+
+<update id="insGameData_R_5">
+UPDATE CW A
+   SET R_5_EMAIL = #{email}
+     , R_5_K = #{killTxt}
+     , R_5_D = #{deathTxt}
+     , R_5_A = #{assistTxt}
+     , R_5_CHAMP = #{champNo}
+     , R_5_WRITER = #{sEmail}
+     , R_5_WDATE = NOW()
+ WHERE A.NO = #{no}
+   AND A.CLAN = getClan(#{sEmail})
+   AND A.REF_FLG = 0
+   AND A.DEL_YN = 'N'
+</update>
+
+<update id="updateWinTeam">
+UPDATE CW A
+   SET WIN = #{win}
+     , WIN_WRITER = #{sEmail}
+ WHERE A.NO = #{no}
+   AND A.CLAN = getClan(#{sEmail})
+   AND A.REF_FLG = 0
+   AND A.DEL_YN = 'N'
+</update>
+
+</mapper>

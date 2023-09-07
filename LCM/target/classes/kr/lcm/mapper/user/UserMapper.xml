@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.lcm.mapper.user.UserMapper">
+
+<select id="chkLogin" parameterType="hashMap" resultType="hashMap">
+  SELECT A.EMAIL         AS EMAIL
+       , A.PW            AS PW
+       , A.EMAIL_AUTH    AS EMAIL_AUTH
+    FROM USER A
+   WHERE A.EMAIL  = #{email}
+     AND A.PW     = #{pw}
+</select>
+
+<select id="chkJoin" parameterType="hashMap" resultType="hashMap">
+  SELECT 'DUPLICATE' AS FLG
+    FROM USER A
+   WHERE A.EMAIL = #{email}
+UNION ALL
+  SELECT 'WITHDRAW' AS FLG
+    FROM USER_WITHDRAW B
+   WHERE B.EMAIL = #{email}
+</select>
+ 	
+<insert id="join">
+INSERT INTO USER (
+                  EMAIL
+                , PW
+                , EMAIL_AUTH
+                ) 
+         VALUES (
+                  #{email}
+                , #{pw}
+                , #{email_auth}
+                )
+</insert>
+
+<select id="chkFind" parameterType="hashMap" resultType="hashMap">
+  SELECT A.EMAIL AS FLG
+    FROM USER A
+   WHERE A.EMAIL = #{email}
+</select>
+
+<update id="updatePw">
+  UPDATE USER A
+     SET A.PW = #{pw}
+   WHERE A.EMAIL = #{email}
+</update>
+
+<select id="chkAuthEmail" parameterType="hashMap" resultType="hashMap">
+  SELECT A.EMAIL AS EMAIL
+    FROM USER A
+   WHERE A.EMAIL      = #{email}
+	 AND A.EMAIL_AUTH = #{email_auth}
+</select>
+
+<update id="updateAuthEmail">
+  UPDATE USER A
+     SET A.EMAIL_AUTH = 'pass'
+   WHERE A.EMAIL  = #{email}
+</update>
+
+</mapper>

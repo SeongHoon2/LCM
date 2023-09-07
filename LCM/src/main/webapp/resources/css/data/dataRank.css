@@ -1,0 +1,151 @@
+@charset "UTF-8";
+
+.dataConDiv_frame{
+	width: 1200px;
+    margin: 0 auto;
+	margin-top : 20px;
+}
+
+.dataRankDiv{
+	width : 540px;
+	height : 600px;
+	display : inline-block;
+	margin-left : 40px;
+	border : 0;
+	vertical-align : top;
+}
+
+.dataEloDiv{
+	width : 540px;
+	height : 600px;
+	display : inline-block;
+	margin-left : 40px;
+	border : 0;
+	vertical-align : top;
+}
+
+.dataRankDiv_list{
+	width : 100%;
+	height : 590px;
+}
+
+.dataRankDiv_list table{
+	width : 100%;
+}
+
+.titleTr{
+	background-color : #3275A2;
+	color : white;
+	font-weight : bold;
+	height : 30px;
+}
+
+.conTr{
+	font-size : 13px;
+	height : 40px;
+	cursor : pointer;
+	border-bottom : 1px solid lightgray;
+	border-left : 1px solid lightgray;
+	border-right : 1px solid lightgray;
+}
+
+.conTr_sel{
+	font-size : 13px;
+	height : 40px;
+	cursor : pointer;
+	background-color : #3275A214;
+	border-bottom : 1px solid lightgray;
+	border-left : 1px solid lightgray;
+	border-right : 1px solid lightgray;
+}
+
+.blankTr{
+	font-size : 13px;
+	height : 40px;
+	border-bottom : 1px solid lightgray;
+	border-left : 1px solid lightgray;
+	border-right : 1px solid lightgray;
+}
+
+.conTr:hover{
+	background-color : #3275A214;
+}
+
+.titleTr th, .conTr th, .conTr_sel th{
+	vertical-align : middle;
+}
+
+.dataRankDiv_pg{
+	width : 100%;
+	height : 30px;
+	margin-top : 10px;
+	text-align : center;
+}
+
+.dataPgNBtn, .dataHistPgNBtn{
+	font-size : 13px;
+	border : 0;
+	cursor : pointer;
+	background-color : white;
+	font-family : 'IBM Plex Sans KR', sans-serif;
+}
+
+.dataPgNBtn:hover, .dataHistPgNBtn:hover{
+	font-weight : bold;
+}
+
+.dataEloHistDiv{
+	width : 540px;
+	height : 600px;
+}
+
+.dataEloHistDiv table{
+	width : 100%;
+}
+
+.dataEloHistDiv_title{
+	width : 100%;
+	height : 25px;
+	margin-top : 5px;
+	font-weight : bold;
+	font-size : 15px;
+}
+
+.dataEloHistDiv_list{
+	width : 100%;
+	height : 450px;
+}
+
+.dataEloHistDiv_pb{
+	width : 100%;
+	margin-top : 10px;
+	height : 30px;
+	text-align : center;
+}
+
+.dataEloHistDiv_empty{
+	width : 540px;
+	height : 460px;
+	background-color : #3275A242;
+	border-radius : 3px;
+}
+
+.histConTr{
+	font-size : 12px;
+	height : 30px;
+	border-bottom : 1px solid lightgray;
+	border-left : 1px solid lightgray;
+	border-right : 1px solid lightgray;
+}
+
+.histBlankTr{
+	font-size : 12px;
+	height : 30px;
+	border-bottom : 1px solid lightgray;
+	border-left : 1px solid lightgray;
+	border-right : 1px solid lightgray;
+}
+
+.histConTr th, .histBlankTr th{
+	vertical-align : middle;
+}

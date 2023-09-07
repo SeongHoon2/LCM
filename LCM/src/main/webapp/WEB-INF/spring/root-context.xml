@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mybatis-spring="http://mybatis.org/schema/mybatis-spring"
+	xsi:schemaLocation="http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring-1.2.xsd
+		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+	
+	<!-- HikariCP (Connection Pool) -->
+    <bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">
+		<property name="driverClassName" value="net.sf.log4jdbc.sql.jdbcapi.DriverSpy"></property>
+		
+		<!-- PROD -->
+		<!-- <property name="jdbcUrl" value="jdbc:log4jdbc:mysql://15.165.188.0:3306/lcm?serverTimezone=Asia/Seoul&amp;allowMultiQueries=true"></property> -->
+		
+		<!-- DEV -->
+		<property name="jdbcUrl" value="jdbc:log4jdbc:mysql://15.165.188.0:3306/lcm_dev?serverTimezone=Asia/Seoul&amp;allowMultiQueries=true"></property>
+		
+		<property name="username" value="lcm"></property>
+		<property name="password" value="1q2w#E$R%T"></property>
+		
+	</bean>
+    
+    <!-- Hikari DataSource -->
+    <bean id="datasource" class="com.zaxxer.hikari.HikariDataSource" destroy-method="close"> 
+        <constructor-arg ref="hikariConfig"></constructor-arg> 
+    </bean>
+       
+    <!-- SqlSession -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="datasource"></property>
+        <property name="mapperLocations" value ="classpath:kr/lcm/mapper/*.xml" />
+    </bean>
+    
+    <!-- MyBatis -->
+    <mybatis-spring:scan base-package="kr.lcm.mapper"/>
+    <context:component-scan base-package="kr.lcm.model"></context:component-scan>
+    <context:component-scan base-package="kr.lcm.service"></context:component-scan>
+</beans>

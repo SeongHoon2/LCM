@@ -1,0 +1,150 @@
+@charset "UTF-8";
+@import "/resources/css/layout/setting.css";
+
+.content_loginDiv{
+	width : 300px;
+	margin : 0 auto;
+	height : 240px;
+	margin-top : 188px;
+	border-radius : 3px;
+	border : 1px solid lightgray;
+	text-align : center;
+}
+
+.content_loginDiv_id{
+	width : 100%;
+	margin-top : 50px;
+	height : 50px;
+}
+
+.content_loginDiv_pw{
+	width : 100%;
+	height : 50px;
+}
+
+.content_loginDiv_btn, .content_loginDiv_find{
+	width : 100%;
+	height : 30px;
+}
+
+.content_loginDiv_emailTxt, .content_loginDiv_pwTxt{
+	padding-left : 10px;
+	padding-right : 10px;
+	width : 140px;
+	height : 25px;
+	font-family: 'IBM Plex Sans KR', sans-serif;
+}
+
+.content_loginDiv_LoginBtn, .content_loginDiv_JoinBtn, .content_loginDiv_FindBtn{
+	border : 0;
+	background-color : white;
+	color : #3275A2;
+	cursor : pointer;
+}
+
+.content_loginDiv_LoginBtn:hover, .content_loginDiv_JoinBtn:hover, .content_loginDiv_FindBtn:hover{
+	font-weight : bold;
+}
+
+.content_formDiv_term{
+	width : 600px;
+	margin : 0 auto;
+	height : 300px;
+	margin-top : 40px;
+	border-radius : 3px;
+	border : 1px solid lightgray;
+	overflow : auto;
+}
+
+.content_formDiv_chk{
+	width : 340px;
+	margin : 0 auto;
+	height : 10px;
+	text-align : center;
+}
+
+.content_formDiv{
+	width : 300px;
+	margin : 0 auto;
+	height : 220px;
+	margin-top : 20px;
+	border-radius : 3px;
+	border : 1px solid lightgray;
+	text-align : center;
+}
+
+.termChkBtn{
+	
+}
+
+.content_formDiv_id{
+	width : 100%;
+	margin-top : 60px;
+	height : 50px;
+}
+
+.content_formDiv_pw, .content_formDiv_btn{
+	width : 100%;
+	height : 50px;
+}
+
+.content_formDiv_emailTxt, .content_formDiv_pwTxt{
+	padding-left : 10px;
+	padding-right : 10px;
+	width : 140px;
+	height : 25px;
+	font-family: 'IBM Plex Sans KR', sans-serif;
+}
+
+.content_formDiv_joinBtn, .content_formDiv_backBtn{
+	border : 0;
+	background-color : white;
+	color : #3275A2;
+	cursor : pointer;
+}
+
+.content_formDiv_joinBtn:hover, .content_formDiv_backBtn:hover{
+	font-weight : bold;
+}
+
+.content_findDiv, .content_authDiv{
+	width : 300px;
+	margin : 0 auto;
+	height : 130px;
+	margin-top : 258px;
+	border-radius : 3px;
+	border : 1px solid lightgray;
+	text-align : center;
+}
+
+.content_findDiv_id, .content_authDiv_auth{
+	width : 100%;
+	margin-top : 30px;
+	height : 50px;
+}
+
+.content_findDiv_btn, .content_authDiv_btn{
+	width : 100%;
+	height : 30px;
+}
+
+.content_findDiv_emailTxt, .content_authDiv_emailAuthTxt{
+	padding-left : 10px;
+	padding-right : 10px;
+	width : 200px;
+	height : 25px;
+	font-family: 'IBM Plex Sans KR', sans-serif;
+}
+
+.content_findDiv_findBtn, .content_findDiv_backBtn,
+.content_authDiv_authBtn,.content_authDiv_backBtn{
+	border : 0;
+	background-color : white;
+	color : #3275A2;
+	cursor : pointer;	
+}
+
+.content_findDiv_findBtn:hover, .content_findDiv_backBtn:hover, 
+.content_authDiv_authBtn:hover, .content_authDiv_backBtn:hover{
+	font-weight : bold;
+}

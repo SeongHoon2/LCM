@@ -1,0 +1,215 @@
+@charset "UTF-8";
+
+.gameDocDiv{
+	padding-left : 20px;
+    margin-bottom : 10px;
+	display : inline-block;
+}
+
+
+.gameDocDiv_frame{
+	margin-top : 20px;
+	width : 934px;
+	height : 550px;
+	border-radius : 6px;
+	border : 1px solid #3275A242;
+}
+
+.gameDocDiv_titleDiv{
+	width : 100%;
+	height : 50px;
+	margin-top : 10px;
+}
+
+.gameDocDiv_titleDiv_l{
+	width : 26%;
+	height : 100%;
+	display : inline-block;
+	vertical-align : top;
+}
+
+.gameDocDiv_titleDiv_m{
+	width : 48%;
+	height: 41px;
+    margin-top: 9px;
+	display : inline-block;
+	text-align : center;
+	vertical-align : top;
+	line-height: 1.5;
+}
+
+.gameDocDiv_utilDiv{
+	width : 100%;
+	margin-top : 20px;
+	height : 45px;
+}
+
+.gameDocDiv_utilDiv_l{
+	width : 157px;
+	height : 100%;
+	display : inline-block;
+	color : #2C55CD;
+	text-align : left;
+	vertical-align : top;
+	font-size: 24px;
+    font-weight: bold;
+    margin-left : 20px;
+}
+
+.gameDocDiv_utilDiv_m{
+	width : 582px;
+	height : 100%;
+	display : inline-block;
+	vertical-align : top;
+	text-align : center;
+}
+
+.gameDocDiv_utilDiv_r{
+	width : 157px;
+	height : 100%;
+	display : inline-block;
+	color : #CD2C2C;
+	text-align : right;
+	vertical-align : top;
+	font-size: 24px;
+    font-weight: bold;
+}
+
+.gameDocDiv_conDiv{
+	width : 100%;
+	height : 406px;
+}
+
+.gameDocDiv_conDiv_l{
+	width : 407px;
+	height : 100%;
+	display : inline-block;
+	vertical-align : top;
+	margin-left: 20px;
+}
+
+.gameDocDiv_conDiv_l_div{
+	width : 100%;
+	height : 81px;
+	background: url("../../img/bTeam.png");
+}
+
+.gameDocDiv_conDiv_m{
+	width : 80px;
+	height : 100px;
+	display : inline-block;
+	vertical-align : top;
+}
+
+.gameDocDiv_conDiv_m_div{
+	width : 81px;
+	height : 81px;
+}
+
+.gameDocDiv_conDiv_m_div img{
+	margin-left : 10px;
+	margin-top : 10px;
+	width : 61px;
+	height : 61px;
+}
+
+.gameDocDiv_conDiv_r{
+	width : 407px;
+	height : 100%;
+	display : inline-block;
+	vertical-align : top;
+}
+
+.gameDocDiv_conDiv_r_div{
+	width : 100%;
+	height : 81px;
+	background: url("../../img/rTeam.png");
+}
+
+.gameDoc_top{
+	width : 100%;
+	height : 74px;
+}
+
+.gameDoc_img{
+	width : 74px;
+	height : 74px;
+	display : inline-block;
+	vertical-align : top;
+}
+
+.gameDoc_img img{
+	width : 74px;
+	height : 74px; 
+}
+
+.gameDoc_con{
+	width : 333px;
+	height : 74px;
+	display : inline-block;
+}
+
+.gameDoc_con_top{
+	width : 333px;
+	height : 40px;
+}
+
+.gameDoc_con_top_l{
+	width : 288px;
+	height : 20px;
+	margin-left : 15px;
+	margin-top : 16px;
+	display : inline-block;
+	font-size: 20px;
+    font-weight: bold;
+	text-align : left;
+}
+
+.gameDoc_con_top_l_RED{
+	width : 318px;
+	height : 20px;
+	margin-right : 15px;
+	margin-top : 16px;
+	display : inline-block;
+	font-size: 20px;
+    font-weight: bold;
+	text-align : right;
+}
+
+.gameDoc_con_bot{
+	width : 333px;
+	height : 24px;
+}
+
+.gameDoc_con_bot_l{
+	width : 296px;
+	height : 24px;
+	margin-top : 6px;
+	margin-left : 17px;
+	display : inline-block;
+}
+
+.gameDoc_con_bot_l_RED{
+    width: 316px;
+    height: 24px;
+    margin-top: 6px;
+    display: inline-block;
+    text-align: right;
+}
+
+.gameDoc_con_bot_r{
+	width : 210px;
+	height : 24px;
+	display : inline-block;
+	text-align : right;
+	vertical-align : bottom;
+}
+
+.gameDoc_con_bot_r_RED{
+	width: 211px;
+    height: 24px;
+    display: inline-block;
+    text-align: left;
+    margin-left: 9px;
+	vertical-align : bottom;
+}

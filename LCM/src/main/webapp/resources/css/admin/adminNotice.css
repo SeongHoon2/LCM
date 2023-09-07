@@ -1,0 +1,69 @@
+@charset "UTF-8";
+
+.adminNoticeConDiv{
+	width: 534px;
+    margin: 0 auto;
+	margin-top : 30px;
+}
+
+.adminNoticeConDiv_top{
+	width : 100%;
+	height : 290px;
+	text-align : center;
+}
+.adminNoticeConDiv_bot{
+	width : 100%;
+	height : 30px;
+	margin-top : 10px;
+	text-align : center;
+}
+
+.noticeBtn{
+	font-size : 13px;
+	border : 0;
+	cursor : pointer;
+	background-color : white;
+}
+
+.noticeBtn:hover{
+	font-weight : bold;
+}
+
+.adminNoticeConDiv_top_left{
+	width : 260px;
+	height : 100%;
+	display : inline-block;
+	vertical-align : top;
+}
+
+.adminNoticeConDiv_top_right{
+	margin-left : 20px;
+	width : 240px;
+	height : 100%;
+	display : inline-block;
+	vertical-align : top;
+}
+
+.adminNotice_wri{
+	width: 250px;
+    height: 50px;
+}
+
+.adminNotice_title{
+    width: 230px;
+    height: 20px;
+    margin-top : 120px;
+    text-align: left;
+}
+
+.adminNotice_pre{
+    width: 210px;
+    height: 40px;
+	padding-left:10px;
+	padding-right:10px;
+	padding-top:5px;
+    border: 1px solid lightgray;
+    border-radius: 3px;
+    text-align: left;
+    overflow-y : auto;
+}

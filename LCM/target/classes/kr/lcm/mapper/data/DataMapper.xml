@@ -1,0 +1,1389 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.lcm.mapper.data.DataMapper">
+
+<select id="eloRankCnt" parameterType="hashMap" resultType="int">
+  SELECT COUNT(*) AS CNT
+    FROM ACCOUNT A
+   WHERE A.CLAN = getClan(#{sEmail})
+</select>
+
+<select id="eloRankList" parameterType="hashMap" resultType="hashMap">
+  SELECT RES.RANKING     AS RANKING
+	   , RES.EMAIL       AS EMAIL
+       , RES.NICK        AS NICK
+       , RES.PREFER_LINE AS PREFER_LINE
+       , RES.ELO         AS ELO
+    FROM (
+		  SELECT A.EMAIL                                             AS EMAIL
+		       , A.NICK                                              AS NICK
+		       , A.PREFER_LINE                                       AS PREFER_LINE
+		       , A.ELO                                               AS ELO
+		       , DENSE_RANK() OVER(ORDER BY A.ELO DESC)              AS RANKING
+		       , ROW_NUMBER() OVER(ORDER BY A.ELO DESC, A.EMAIL ASC) AS RNK
+		    FROM ACCOUNT A
+		   WHERE A.CLAN = getClan(#{sEmail})
+		 ) RES
+   WHERE RES.RNK BETWEEN #{startCnt} AND #{endCnt}
+</select>
+
+<select id="eloHistCnt" parameterType="hashMap" resultType="int">
+  SELECT COUNT(*) AS CNT
+    FROM ELO_HIST A
+   WHERE A.CLAN = getClan(#{sEmail})
+     AND A.EMAIL = #{rnkEmail}
+</select>
+
+<select id="eloHistList" parameterType="hashMap" resultType="hashMap">
+  SELECT RES.BEF_ELO AS BEF_ELO
+	   , RES.PM_ELO  AS PM_ELO
+       , RES.AFT_ELO AS AFT_ELO
+       , RES.NOTE    AS NOTE
+       , RES.WDATE   AS WDATE
+    FROM (
+          SELECT A.BEF_ELO
+		       , A.PM_ELO
+		       , A.AFT_ELO
+		       , A.NOTE
+		       , DATE_FORMAT(A.WDATE, '%y-%m-%d %H:%i') AS WDATE
+		       , ROW_NUMBER() OVER(ORDER BY A.WDATE DESC) AS RNK
+		    FROM ELO_HIST A
+		   WHERE A.CLAN = getClan(#{sEmail})
+		     AND A.EMAIL = #{rnkEmail}    
+         ) RES
+   WHERE RES.RNK BETWEEN #{startCnt} AND #{endCnt}
+</select>
+
+<select id="getMaxGameNo" parameterType="hashMap" resultType="hashMap">
+  SELECT RES.NO AS NO
+    FROM (
+          SELECT A.NO                                      AS NO
+               , ROW_NUMBER() OVER(ORDER BY A.GDATE DESC)  AS RNK
+            FROM CW A
+           WHERE A.CLAN = getClan(#{sEmail})
+             AND A.REF_FLG = 1
+             AND DATE_FORMAT(A.GDATE,'%Y-%m') = #{ym}
+             AND A.DEL_YN = 'N'
+         ) RES
+   WHERE RES.RNK = 1
+</select>
+
+<select id="gameInsCnt" parameterType="hashMap" resultType="int">
+  SELECT COUNT(*) AS CNT
+    FROM CW A
+   WHERE A.CLAN = getClan(#{sEmail})
+     AND A.REF_FLG = 1
+     AND DATE_FORMAT(A.GDATE,'%Y-%m') = #{ym}
+     AND A.DEL_YN = 'N'
+</select>
+
+<select id="gameInsList" parameterType="hashMap" resultType="hashMap">
+  SELECT RES.NO
+       , RES.NAME
+    FROM (
+          SELECT A.NO                                      AS NO
+               , A.NAME                                    AS NAME
+               , ROW_NUMBER() OVER(ORDER BY A.GDATE DESC)  AS RNK
+            FROM CW A
+           WHERE A.CLAN = getClan(#{sEmail})
+             AND A.REF_FLG = 1
+             AND DATE_FORMAT(A.GDATE,'%Y-%m') = #{ym}
+             AND A.DEL_YN = 'N'
+         ) RES
+   WHERE RES.RNK BETWEEN #{startCnt} AND #{endCnt}
+</select>
+
+<select id="getDataGameDoc" parameterType="hashMap" resultType="hashMap">
+  SELECT A.NO                                                AS NO
+       , CASE WHEN A.REG_FLG = 0 THEN '정기' ELSE '수시' END    AS REG_FLG
+       , A.NAME                                              AS NAME
+       , DATE_FORMAT(A.GDATE, '%y-%m-%d %H:%i')              AS GDATE
+       , A.WIN                                               AS WIN
+    FROM CW A
+   WHERE A.CLAN = getClan(#{sEmail})
+     AND A.REF_FLG = 1
+     AND A.NO = #{no}
+     AND A.DEL_YN = 'N'
+</select>
+
+<select id="getDataGameList" parameterType="hashMap" resultType="hashMap">
+  SELECT getNick(A.B_1_EMAIL, #{sEmail}) AS NICK
+       , A.B_1_CHAMP                     AS CHAMP
+       , A.B_1_K                         AS K
+       , A.B_1_D                         AS D
+       , A.B_1_A                         AS A
+       , ROUND((A.B_1_K+A.B_1_A)/(A.B_1_D),2) AS KDA
+       , T1.BEF_ELO                      AS BEF_ELO
+       , T1.PM_ELO                       AS PM_ELO
+    FROM CW A
+    LEFT OUTER JOIN ELO_HIST T1 ON A.B_1_EMAIL = T1.EMAIL
+                          AND A.CLAN = T1.CLAN
+                          AND A.NO = T1.CW
+   WHERE A.CLAN = getClan(#{sEmail})
+     AND A.REF_FLG = 1
+     AND A.NO = #{no}
+     AND A.DEL_YN = 'N'
+UNION ALL
+  SELECT getNick(B.B_2_EMAIL, #{sEmail})  AS NICK
+       , B.B_2_CHAMP                      AS CHAMP
+       , B.B_2_K                          AS K
+       , B.B_2_D                          AS D
+       , B.B_2_A                          AS A
+       , ROUND((B.B_2_K+B.B_2_A)/(B.B_2_D),2) AS KDA
+       , T2.BEF_ELO                       AS BEF_ELO
+       , T2.PM_ELO                        AS PM_ELO
+    FROM CW B
+    LEFT OUTER JOIN ELO_HIST T2 ON B.B_2_EMAIL = T2.EMAIL
+                          AND B.CLAN = T2.CLAN
+                          AND B.NO = T2.CW
+   WHERE B.CLAN = getClan(#{sEmail})
+     AND B.REF_FLG = 1
+     AND B.NO = #{no}
+     AND B.DEL_YN = 'N'
+UNION ALL
+  SELECT getNick(C.B_3_EMAIL, #{sEmail})  AS NICK
+       , C.B_3_CHAMP                      AS CHAMP
+       , C.B_3_K                          AS K
+       , C.B_3_D                          AS D
+       , C.B_3_A                          AS A
+       , ROUND((C.B_3_K+C.B_3_A)/(C.B_3_D),2) AS KDA
+       , T3.BEF_ELO                       AS BEF_ELO
+       , T3.PM_ELO                        AS PM_ELO
+    FROM CW C
+    LEFT OUTER JOIN ELO_HIST T3 ON C.B_3_EMAIL = T3.EMAIL
+                          AND C.CLAN = T3.CLAN
+                          AND C.NO = T3.CW
+   WHERE C.CLAN = getClan(#{sEmail})
+     AND C.REF_FLG = 1
+     AND C.NO = #{no}
+     AND C.DEL_YN = 'N'
+UNION ALL
+  SELECT getNick(D.B_4_EMAIL, #{sEmail})  AS NICK
+       , D.B_4_CHAMP                      AS CHAMP
+       , D.B_4_K                          AS K
+       , D.B_4_D                          AS D
+       , D.B_4_A                          AS A
+       , ROUND((D.B_4_K+D.B_4_A)/(D.B_4_D),2) AS KDA
+       , T4.BEF_ELO                       AS BEF_ELO
+       , T4.PM_ELO                        AS PM_ELO
+    FROM CW D
+    LEFT OUTER JOIN ELO_HIST T4 ON D.B_4_EMAIL = T4.EMAIL
+                          AND D.CLAN = T4.CLAN
+                          AND D.NO = T4.CW
+   WHERE D.CLAN = getClan(#{sEmail})
+     AND D.REF_FLG = 1
+     AND D.NO = #{no}
+     AND D.DEL_YN = 'N'
+UNION ALL
+  SELECT getNick(E.B_5_EMAIL, #{sEmail})  AS NICK
+       , E.B_5_CHAMP                      AS CHAMP
+       , E.B_5_K                          AS K
+       , E.B_5_D                          AS D
+       , E.B_5_A                          AS A
+       , ROUND((E.B_5_K+E.B_5_A)/(E.B_5_D),2) AS KDA
+       , T5.BEF_ELO                       AS BEF_ELO
+       , T5.PM_ELO                        AS PM_ELO
+    FROM CW E
+    LEFT OUTER JOIN ELO_HIST T5 ON E.B_5_EMAIL = T5.EMAIL
+                          AND E.CLAN = T5.CLAN
+                          AND E.NO = T5.CW
+   WHERE E.CLAN = getClan(#{sEmail})
+     AND E.REF_FLG = 1
+     AND E.NO = #{no}
+     AND E.DEL_YN = 'N'
+UNION ALL
+  SELECT getNick(F.R_1_EMAIL, #{sEmail}) AS NICK
+       , F.R_1_CHAMP                     AS CHAMP
+       , F.R_1_K                         AS K
+       , F.R_1_D                         AS D
+       , F.R_1_A                         AS A
+       , ROUND((F.R_1_K+F.R_1_A)/(F.R_1_D),2) AS KDA
+       , T6.BEF_ELO                      AS BEF_ELO
+       , T6.PM_ELO                       AS PM_ELO
+    FROM CW F
+    LEFT OUTER JOIN ELO_HIST T6 ON F.R_1_EMAIL = T6.EMAIL
+                          AND F.CLAN = T6.CLAN
+                          AND F.NO = T6.CW
+   WHERE F.CLAN = getClan(#{sEmail})
+     AND F.REF_FLG = 1
+     AND F.NO = #{no}
+     AND F.DEL_YN = 'N'
+UNION ALL
+  SELECT getNick(G.R_2_EMAIL, #{sEmail})  AS NICK
+       , G.R_2_CHAMP                      AS CHAMP
+       , G.R_2_K                          AS K
+       , G.R_2_D                          AS D
+       , G.R_2_A                          AS A
+       , ROUND((G.R_2_K+G.R_2_A)/(G.R_2_D),2) AS KDA
+       , T7.BEF_ELO                       AS BEF_ELO
+       , T7.PM_ELO                        AS PM_ELO
+    FROM CW G
+    LEFT OUTER JOIN ELO_HIST T7 ON G.R_2_EMAIL = T7.EMAIL
+                          AND G.CLAN = T7.CLAN
+                          AND G.NO = T7.CW
+   WHERE G.CLAN = getClan(#{sEmail})
+     AND G.REF_FLG = 1
+     AND G.NO = #{no}
+     AND G.DEL_YN = 'N'
+UNION ALL
+  SELECT getNick(H.R_3_EMAIL, #{sEmail})  AS NICK
+       , H.R_3_CHAMP                      AS CHAMP
+       , H.R_3_K                          AS K
+       , H.R_3_D                          AS D
+       , H.R_3_A                          AS A
+       , ROUND((H.R_3_K+H.R_3_A)/(H.R_3_D),2) AS KDA
+       , T8.BEF_ELO                       AS BEF_ELO
+       , T8.PM_ELO                        AS PM_ELO
+    FROM CW H
+    LEFT OUTER JOIN ELO_HIST T8 ON H.R_3_EMAIL = T8.EMAIL
+                          AND H.CLAN = T8.CLAN
+                          AND H.NO = T8.CW
+   WHERE H.CLAN = getClan(#{sEmail})
+     AND H.REF_FLG = 1
+     AND H.NO = #{no}
+     AND H.DEL_YN = 'N'
+UNION ALL
+  SELECT getNick(I.R_4_EMAIL, #{sEmail})  AS NICK
+       , I.R_4_CHAMP                      AS CHAMP
+       , I.R_4_K                          AS K
+       , I.R_4_D                          AS D
+       , I.R_4_A                          AS A
+       , ROUND((I.R_4_K+I.R_4_A)/(I.R_4_D),2) AS KDA
+       , T9.BEF_ELO                       AS BEF_ELO
+       , T9.PM_ELO                        AS PM_ELO
+    FROM CW I
+    LEFT OUTER JOIN ELO_HIST T9 ON I.R_4_EMAIL = T9.EMAIL
+                          AND I.CLAN = T9.CLAN
+                          AND I.NO = T9.CW
+   WHERE I.CLAN = getClan(#{sEmail})
+     AND I.REF_FLG = 1
+     AND I.NO = #{no}
+     AND I.DEL_YN = 'N'
+UNION ALL
+  SELECT getNick(J.R_5_EMAIL, #{sEmail})  AS NICK
+       , J.R_5_CHAMP                      AS CHAMP
+       , J.R_5_K                          AS K
+       , J.R_5_D                          AS D
+       , J.R_5_A                          AS A
+       , ROUND((J.R_5_K+J.R_5_A)/(J.R_5_D),2) AS KDA
+       , T10.BEF_ELO                      AS BEF_ELO
+       , T10.PM_ELO                       AS PM_ELO
+    FROM CW J
+    LEFT OUTER JOIN ELO_HIST T10 ON J.R_5_EMAIL = T10.EMAIL
+                           AND J.CLAN = T10.CLAN
+                           AND J.NO = T10.CW
+   WHERE J.CLAN = getClan(#{sEmail})
+     AND J.REF_FLG = 1
+     AND J.NO = #{no}
+     AND J.DEL_YN = 'N'
+</select>
+
+<select id="getChampTop5List" parameterType="hashMap" resultType="hashMap">
+  SELECT DAT.CHAMP    AS CHAMP
+       , DAT.K        AS K
+       , DAT.D        AS D
+		 , DAT.A        AS A
+		 , DAT.KDA      AS KDA
+		 , DAT.WIN      AS WIN
+		 , DAT.DEF      AS DEF
+		 , DAT.CNT      AS GAME_CNT
+		 , DAT.WIN_RATE AS WIN_RATE
+    FROM (         
+		 SELECT RES.CHAMP     AS CHAMP
+		      , COUNT(*)      AS CNT
+		      , SUM(RES.K)    AS K
+		      , SUM(RES.D)    AS D
+		      , SUM(RES.A)    AS A
+		      , ROUND((SUM(RES.K)+SUM(RES.A))/SUM(RES.D),2) AS KDA
+		      , SUM(RES.WIN) AS WIN
+		      , SUM(RES.DEF) AS DEF
+		      , ROUND((SUM(RES.WIN)/(SUM(RES.WIN)+SUM(RES.DEF)))*100) AS WIN_RATE
+		      , ROW_NUMBER() OVER(ORDER BY COUNT(*) DESC, ROUND((SUM(RES.WIN)/(SUM(RES.WIN)+SUM(RES.DEF)))*100) DESC, ROUND((SUM(RES.K)+SUM(RES.A))/SUM(RES.D),2) DESC) AS RNK
+		   FROM (
+			  SELECT A.B_1_CHAMP AS CHAMP
+			       , A.B_1_K     AS K
+			       , A.B_1_D     AS D
+			       , A.B_1_A     AS A
+			       , CASE WHEN  A.WIN = 0 THEN 1 ELSE 0 END WIN
+			       , CASE WHEN  A.WIN = 1 THEN 1 ELSE 0 END DEF
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND #{nick} = getNick(A.B_1_EMAIL, #{sEmail})
+				  AND A.DEL_YN = 'N'
+			UNION ALL
+			  SELECT A.B_2_CHAMP AS CHAMP
+			       , A.B_2_K     AS K
+			       , A.B_2_D     AS D
+			       , A.B_2_A     AS A
+			       , CASE WHEN  A.WIN = 0 THEN 1 ELSE 0 END WIN
+			       , CASE WHEN  A.WIN = 1 THEN 1 ELSE 0 END DEF
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND #{nick} = getNick(A.B_2_EMAIL, #{sEmail})
+				  AND A.DEL_YN = 'N'
+			UNION ALL
+			  SELECT A.B_3_CHAMP AS CHAMP
+			       , A.B_3_K     AS K
+			       , A.B_3_D     AS D
+			       , A.B_3_A     AS A
+			       , CASE WHEN  A.WIN = 0 THEN 1 ELSE 0 END WIN
+			       , CASE WHEN  A.WIN = 1 THEN 1 ELSE 0 END DEF
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND #{nick} = getNick(A.B_3_EMAIL, #{sEmail})
+				  AND A.DEL_YN = 'N'
+			UNION ALL
+			  SELECT A.B_4_CHAMP AS CHAMP
+			       , A.B_4_K     AS K
+			       , A.B_4_D     AS D
+			       , A.B_4_A     AS A
+			       , CASE WHEN  A.WIN = 0 THEN 1 ELSE 0 END WIN
+			       , CASE WHEN  A.WIN = 1 THEN 1 ELSE 0 END DEF
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND #{nick} = getNick(A.B_4_EMAIL, #{sEmail})
+				  AND A.DEL_YN = 'N'
+			UNION ALL
+			  SELECT A.B_5_CHAMP AS CHAMP
+			       , A.B_5_K     AS K
+			       , A.B_5_D     AS D
+			       , A.B_5_A     AS A
+			       , CASE WHEN  A.WIN = 0 THEN 1 ELSE 0 END WIN
+			       , CASE WHEN  A.WIN = 1 THEN 1 ELSE 0 END DEF
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND #{nick} = getNick(A.B_5_EMAIL, #{sEmail})
+			 	  AND A.DEL_YN = 'N'
+			UNION ALL
+			  SELECT A.R_1_CHAMP AS CHAMP
+			       , A.R_1_K     AS K
+			       , A.R_1_D     AS D
+			       , A.R_1_A     AS A
+				    , CASE WHEN  A.WIN = 1 THEN 1 ELSE 0 END WIN
+				    , CASE WHEN  A.WIN = 0 THEN 1 ELSE 0 END DEF
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND #{nick} = getNick(A.R_1_EMAIL, #{sEmail})
+				  AND A.DEL_YN = 'N'
+			UNION ALL
+			  SELECT A.R_2_CHAMP AS CHAMP
+			       , A.R_2_K     AS K
+			       , A.R_2_D     AS D
+			       , A.R_2_A     AS A
+			       , CASE WHEN  A.WIN = 1 THEN 1 ELSE 0 END WIN
+			       , CASE WHEN  A.WIN = 0 THEN 1 ELSE 0 END DEF
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND #{nick} = getNick(A.R_2_EMAIL, #{sEmail})
+				  AND A.DEL_YN = 'N'
+			UNION ALL
+			  SELECT A.R_3_CHAMP AS CHAMP
+			       , A.R_3_K     AS K
+			       , A.R_3_D     AS D
+			       , A.R_3_A     AS A
+			       , CASE WHEN  A.WIN = 1 THEN 1 ELSE 0 END WIN
+			       , CASE WHEN  A.WIN = 0 THEN 1 ELSE 0 END DEF
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND #{nick} = getNick(A.R_3_EMAIL, #{sEmail})
+				  AND A.DEL_YN = 'N'
+			UNION ALL
+			  SELECT A.R_4_CHAMP AS CHAMP
+			       , A.R_4_K     AS K
+			       , A.R_4_D     AS D
+			       , A.R_4_A     AS A
+			       , CASE WHEN  A.WIN = 1 THEN 1 ELSE 0 END WIN
+			       , CASE WHEN  A.WIN = 0 THEN 1 ELSE 0 END DEF
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND #{nick} = getNick(A.R_4_EMAIL, #{sEmail})
+				  AND A.DEL_YN = 'N'
+			UNION ALL
+			  SELECT A.R_5_CHAMP AS CHAMP
+			       , A.R_5_K     AS K
+			       , A.R_5_D     AS D
+			       , A.R_5_A     AS A
+			       , CASE WHEN  A.WIN = 1 THEN 1 ELSE 0 END WIN
+			       , CASE WHEN  A.WIN = 0 THEN 1 ELSE 0 END DEF
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND #{nick} = getNick(A.R_5_EMAIL, #{sEmail})
+			     AND A.DEL_YN = 'N'
+		        ) RES
+		 GROUP BY RES.CHAMP
+	     ) DAT
+<![CDATA[
+   WHERE DAT.RNK < 6
+]]>
+</select>
+
+<select id="getUsrInfo" parameterType="hashMap" resultType="hashMap">
+  SELECT A.NICK        AS NICK
+       , A.PREFER_LINE AS LINE
+       , A.ELO         AS ELO
+    FROM ACCOUNT A
+   WHERE getNick(A.EMAIL, #{sEmail}) = #{nick}
+     AND A.CLAN = getClan(#{sEmail})
+UNION ALL
+  SELECT CONCAT(A.NICK, '(탈퇴)') AS NICK
+       , A.PREFER_LINE AS LINE
+       , A.ELO         AS ELO
+    FROM ACCOUNT_WITHDRAW A
+   WHERE getNick(A.EMAIL, #{sEmail}) = #{nick}
+     AND A.CLAN = getClan(#{sEmail})
+</select>
+
+<select id="getwdRate" parameterType="hashMap" resultType="hashMap">
+  SELECT RES.FLG
+       , SUM(RES.W) AS W
+       , SUM(RES.D) AS D
+       , SUM(RES.W) + SUM(RES.D) AS TOT
+       , ROUND(SUM(RES.W)/(SUM(RES.W) + SUM(RES.D)),2)*100 AS WRATE
+    FROM (
+			  SELECT 'DAT_M' AS FLG
+			       , CASE WHEN WIN = 0 THEN 1 ELSE 0 END AS W
+			       , CASE WHEN WIN = 1 THEN 1 ELSE 0 END AS D
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND A.REG_FLG = 0
+			     AND (
+				        getNick(B_1_EMAIL, #{sEmail}) = #{nick}
+			         OR getNick(B_2_EMAIL, #{sEmail}) = #{nick}
+			         OR getNick(B_3_EMAIL, #{sEmail}) = #{nick}
+			         OR getNick(B_4_EMAIL, #{sEmail}) = #{nick}
+			         OR getNick(B_5_EMAIL, #{sEmail}) = #{nick}
+			         )
+			UNION ALL
+			  SELECT 'DAT_M' AS FLG
+			       , CASE WHEN WIN = 1 THEN 1 ELSE 0 END AS W
+			       , CASE WHEN WIN = 0 THEN 1 ELSE 0 END AS D
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND A.REG_FLG = 0
+			     AND (
+				        getNick(R_1_EMAIL, #{sEmail}) = #{nick}
+			         OR getNick(R_2_EMAIL, #{sEmail}) = #{nick}
+			         OR getNick(R_3_EMAIL, #{sEmail}) = #{nick}
+			         OR getNick(R_4_EMAIL, #{sEmail}) = #{nick}
+			         OR getNick(R_5_EMAIL, #{sEmail}) = #{nick}
+			         )
+			UNION ALL
+			  SELECT 'DAT_S' AS FLG
+			       , CASE WHEN WIN = 0 THEN 1 ELSE 0 END AS W
+			       , CASE WHEN WIN = 1 THEN 1 ELSE 0 END AS D
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND A.REG_FLG = 1
+			     AND (
+				        getNick(B_1_EMAIL, #{sEmail}) = #{nick}
+			         OR getNick(B_2_EMAIL, #{sEmail}) = #{nick}
+			         OR getNick(B_3_EMAIL, #{sEmail}) = #{nick}
+			         OR getNick(B_4_EMAIL, #{sEmail}) = #{nick}
+			         OR getNick(B_5_EMAIL, #{sEmail}) = #{nick}
+			         )
+			UNION ALL
+			  SELECT 'DAT_S' AS FLG
+			       , CASE WHEN WIN = 1 THEN 1 ELSE 0 END AS W
+			       , CASE WHEN WIN = 0 THEN 1 ELSE 0 END AS D
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND A.REG_FLG = 1
+			     AND (
+				        getNick(R_1_EMAIL, #{sEmail}) = #{nick}
+			         OR getNick(R_2_EMAIL, #{sEmail}) = #{nick}
+			         OR getNick(R_3_EMAIL, #{sEmail}) = #{nick}
+			         OR getNick(R_4_EMAIL, #{sEmail}) = #{nick}
+			         OR getNick(R_5_EMAIL, #{sEmail}) = #{nick}
+			         )
+			UNION ALL
+			  SELECT 'TOT' AS FLG
+			       , CASE WHEN WIN = 0 THEN 1 ELSE 0 END AS W
+			       , CASE WHEN WIN = 1 THEN 1 ELSE 0 END AS D
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND (
+				        getNick(B_1_EMAIL, #{sEmail}) = #{nick}
+			         OR getNick(B_2_EMAIL, #{sEmail}) = #{nick}
+			         OR getNick(B_3_EMAIL, #{sEmail}) = #{nick}
+			         OR getNick(B_4_EMAIL, #{sEmail}) = #{nick}
+			         OR getNick(B_5_EMAIL, #{sEmail}) = #{nick}
+			         )
+			UNION ALL
+			  SELECT 'TOT' AS FLG
+			       , CASE WHEN WIN = 1 THEN 1 ELSE 0 END AS W
+			       , CASE WHEN WIN = 0 THEN 1 ELSE 0 END AS D
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND (
+				        getNick(R_1_EMAIL, #{sEmail}) = #{nick}
+			         OR getNick(R_2_EMAIL, #{sEmail}) = #{nick}
+			         OR getNick(R_3_EMAIL, #{sEmail}) = #{nick}
+			         OR getNick(R_4_EMAIL, #{sEmail}) = #{nick}
+			         OR getNick(R_5_EMAIL, #{sEmail}) = #{nick}
+			         )
+         ) RES
+GROUP BY FLG
+</select>
+
+<select id="getSearchGameListCnt" parameterType="hashMap" resultType="int">
+  SELECT COUNT(*) AS CNT
+    FROM (
+		  SELECT A.NO AS NO
+		    FROM CW A
+		   WHERE A.CLAN = getClan(#{sEmail})
+		     AND A.REF_FLG = 1
+		     AND getNick(A.B_1_EMAIL,#{sEmail}) = #{nick}
+		     AND A.DEL_YN = 'N'
+		UNION ALL
+		  SELECT A.NO AS NO
+		    FROM CW A
+		   WHERE A.CLAN = getClan(#{sEmail})
+		     AND A.REF_FLG = 1
+		     AND getNick(A.B_2_EMAIL,#{sEmail}) = #{nick}
+		     AND A.DEL_YN = 'N'
+		UNION ALL
+		  SELECT A.NO AS NO
+		    FROM CW A
+		   WHERE A.CLAN = getClan(#{sEmail})
+		     AND A.REF_FLG = 1
+		     AND getNick(A.B_3_EMAIL,#{sEmail}) = #{nick}
+		     AND A.DEL_YN = 'N'
+		UNION ALL
+		  SELECT A.NO AS NO
+		    FROM CW A
+		   WHERE A.CLAN = getClan(#{sEmail})
+		     AND A.REF_FLG = 1
+		     AND getNick(A.B_4_EMAIL,#{sEmail}) = #{nick}
+		     AND A.DEL_YN = 'N'
+		UNION ALL
+		  SELECT A.NO AS NO
+		    FROM CW A
+		   WHERE A.CLAN = getClan(#{sEmail})
+		     AND A.REF_FLG = 1
+		     AND getNick(A.B_5_EMAIL,#{sEmail}) = #{nick}
+		     AND A.DEL_YN = 'N'
+		UNION ALL
+		  SELECT A.NO AS NO
+		    FROM CW A
+		   WHERE A.CLAN = getClan(#{sEmail})
+		     AND A.REF_FLG = 1
+		     AND getNick(A.R_1_EMAIL,#{sEmail}) = #{nick}
+		     AND A.DEL_YN = 'N'
+		UNION ALL
+		  SELECT A.NO AS NO
+		    FROM CW A
+		   WHERE A.CLAN = getClan(#{sEmail})
+		     AND A.REF_FLG = 1
+		     AND getNick(A.R_2_EMAIL,#{sEmail}) = #{nick}
+		     AND A.DEL_YN = 'N'
+		UNION ALL
+		  SELECT A.NO AS NO
+		    FROM CW A
+		   WHERE A.CLAN = getClan(#{sEmail})
+		     AND A.REF_FLG = 1
+		     AND getNick(A.R_3_EMAIL,#{sEmail}) = #{nick}
+		     AND A.DEL_YN = 'N'
+		UNION ALL
+		  SELECT A.NO AS NO
+		    FROM CW A
+		   WHERE A.CLAN = getClan(#{sEmail})
+		     AND A.REF_FLG = 1
+		     AND getNick(A.R_4_EMAIL,#{sEmail}) = #{nick}
+		     AND A.DEL_YN = 'N'
+		UNION ALL
+		  SELECT A.NO AS NO
+		    FROM CW A
+		   WHERE A.CLAN = getClan(#{sEmail})
+		     AND A.REF_FLG = 1
+		     AND getNick(A.R_5_EMAIL,#{sEmail}) = #{nick}
+		     AND A.DEL_YN = 'N'
+		   ) RES
+</select>
+
+<select id="getSearchGameList" parameterType="hashMap" resultType="hashMap">
+  SELECT TOT.NO
+       , TOT.WIN
+       , TOT.CHAMP
+       , TOT.KDA
+       , TOT.K
+       , TOT.D
+       , TOT.A
+       , TOT.REG_FLG
+       , TOT.WDATE
+       , TOT.BEF_ELO
+       , TOT.PM_ELO
+    FROM (
+		  SELECT RES.NO
+		       , RES.WIN
+		       , RES.CHAMP
+		       , RES.KDA
+		       , RES.K
+		       , RES.D
+		       , RES.A
+		       , RES.REG_FLG
+		       , RES.WDATE
+		       , RES.BEF_ELO
+		       , RES.PM_ELO
+		       , ROW_NUMBER() OVER(ORDER BY RES.WDATE DESC) AS RNK
+		    FROM (
+				  SELECT A.NO                                   AS NO
+				       , CASE WHEN A.WIN = 0 THEN 1 ELSE 0 END  AS WIN
+				       , A.B_1_CHAMP                            AS CHAMP
+				       , IFNULL(ROUND((B_1_K+B_1_A)/B_1_D,2),0) AS KDA
+				       , A.B_1_K                                AS K
+				       , A.B_1_D                                AS D
+				       , A.B_1_A                                AS A
+				       , A.REG_FLG                              AS REG_FLG
+				       , DATE_FORMAT(A.GDATE,'%y-%m-%d %H:%i')  AS WDATE
+				       , CASE WHEN A.REG_FLG = 0 THEN IFNULL(ELO.BEF_ELO,'사용자 수정') 
+						        ELSE '수시 경기'
+								   END                              AS BEF_ELO
+				       , CASE WHEN A.REG_FLG = 0 THEN IFNULL(ELO.PM_ELO,'-') 
+						        ELSE '-'
+								   END                              AS PM_ELO
+				    FROM CW A
+				    LEFT OUTER JOIN ELO_HIST ELO ON A.NO = ELO.CW AND A.B_1_EMAIL = ELO.EMAIL
+				   WHERE A.CLAN = getClan(#{sEmail})
+				     AND A.REF_FLG = 1
+				     AND getNick(A.B_1_EMAIL,#{sEmail}) = #{nick}
+				     AND A.DEL_YN = 'N'
+				UNION ALL
+				  SELECT A.NO                                   AS NO
+				       , CASE WHEN A.WIN = 0 THEN 1 ELSE 0 END  AS WIN
+				       , A.B_2_CHAMP                            AS CHAMP
+				       , IFNULL(ROUND((B_2_K+B_2_A)/B_2_D,2),0) AS KDA
+				       , A.B_2_K                                AS K
+				       , A.B_2_D                                AS D
+				       , A.B_2_A                                AS A
+				       , A.REG_FLG                              AS REG_FLG
+				       , DATE_FORMAT(A.GDATE,'%y-%m-%d %H:%i')  AS WDATE
+				       , CASE WHEN A.REG_FLG = 0 THEN IFNULL(ELO.BEF_ELO,'사용자 수정') 
+						        ELSE '수시 경기'
+								   END                              AS BEF_ELO
+				       , CASE WHEN A.REG_FLG = 0 THEN IFNULL(ELO.PM_ELO,'-') 
+						        ELSE '-'
+								   END                              AS PM_ELO
+				    FROM CW A
+				    LEFT OUTER JOIN ELO_HIST ELO ON A.NO = ELO.CW AND A.B_2_EMAIL = ELO.EMAIL
+				   WHERE A.CLAN = getClan(#{sEmail})
+				     AND A.REF_FLG = 1
+				     AND getNick(A.B_2_EMAIL,#{sEmail}) = #{nick}
+				     AND A.DEL_YN = 'N'
+				UNION ALL
+				  SELECT A.NO                                   AS NO
+				       , CASE WHEN A.WIN = 0 THEN 1 ELSE 0 END  AS WIN
+				       , A.B_3_CHAMP                            AS CHAMP
+				       , IFNULL(ROUND((B_3_K+B_3_A)/B_3_D,2),0) AS KDA
+				       , A.B_3_K                                AS K
+				       , A.B_3_D                                AS D
+				       , A.B_3_A                                AS A
+				       , A.REG_FLG                              AS REG_FLG
+				       , DATE_FORMAT(A.GDATE,'%y-%m-%d %H:%i')  AS WDATE
+				       , CASE WHEN A.REG_FLG = 0 THEN IFNULL(ELO.BEF_ELO,'사용자 수정') 
+						        ELSE '수시 경기'
+								   END                              AS BEF_ELO
+				       , CASE WHEN A.REG_FLG = 0 THEN IFNULL(ELO.PM_ELO,'-') 
+						        ELSE '-'
+								   END                              AS PM_ELO
+				    FROM CW A
+				    LEFT OUTER JOIN ELO_HIST ELO ON A.NO = ELO.CW AND A.B_3_EMAIL = ELO.EMAIL
+				   WHERE A.CLAN = getClan(#{sEmail})
+				     AND A.REF_FLG = 1
+				     AND getNick(A.B_3_EMAIL,#{sEmail}) = #{nick}
+				     AND A.DEL_YN = 'N'
+				UNION ALL
+				  SELECT A.NO                                   AS NO
+				       , CASE WHEN A.WIN = 0 THEN 1 ELSE 0 END  AS WIN
+				       , A.B_4_CHAMP                            AS CHAMP
+				       , IFNULL(ROUND((B_4_K+B_4_A)/B_4_D,2),0) AS KDA
+				       , A.B_4_K                                AS K
+				       , A.B_4_D                                AS D
+				       , A.B_4_A                                AS A
+				       , A.REG_FLG                              AS REG_FLG
+				       , DATE_FORMAT(A.GDATE,'%y-%m-%d %H:%i')  AS WDATE
+				       , CASE WHEN A.REG_FLG = 0 THEN IFNULL(ELO.BEF_ELO,'사용자 수정') 
+						        ELSE '수시 경기'
+								   END                              AS BEF_ELO
+				       , CASE WHEN A.REG_FLG = 0 THEN IFNULL(ELO.PM_ELO,'-') 
+						        ELSE '-'
+								   END                              AS PM_ELO
+				    FROM CW A
+				    LEFT OUTER JOIN ELO_HIST ELO ON A.NO = ELO.CW AND A.B_4_EMAIL = ELO.EMAIL
+				   WHERE A.CLAN = getClan(#{sEmail})
+				     AND A.REF_FLG = 1
+				     AND getNick(A.B_4_EMAIL,#{sEmail}) = #{nick}
+				     AND A.DEL_YN = 'N'
+				UNION ALL
+				  SELECT A.NO                                   AS NO
+				       , CASE WHEN A.WIN = 0 THEN 1 ELSE 0 END  AS WIN
+				       , A.B_5_CHAMP                            AS CHAMP
+				       , IFNULL(ROUND((B_5_K+B_5_A)/B_5_D,2),0) AS KDA
+				       , A.B_5_K                                AS K
+				       , A.B_5_D                                AS D
+				       , A.B_5_A                                AS A
+				       , A.REG_FLG                              AS REG_FLG
+				       , DATE_FORMAT(A.GDATE,'%y-%m-%d %H:%i')  AS WDATE
+				       , CASE WHEN A.REG_FLG = 0 THEN IFNULL(ELO.BEF_ELO,'사용자 수정') 
+						        ELSE '수시 경기'
+								   END                              AS BEF_ELO
+				       , CASE WHEN A.REG_FLG = 0 THEN IFNULL(ELO.PM_ELO,'-') 
+						        ELSE '-'
+								   END                              AS PM_ELO
+				    FROM CW A
+				    LEFT OUTER JOIN ELO_HIST ELO ON A.NO = ELO.CW AND A.B_5_EMAIL = ELO.EMAIL
+				   WHERE A.CLAN = getClan(#{sEmail})
+				     AND A.REF_FLG = 1
+				     AND getNick(A.B_5_EMAIL,#{sEmail}) = #{nick}
+				     AND A.DEL_YN = 'N'
+				UNION ALL
+				  SELECT A.NO                                   AS NO
+				       , CASE WHEN A.WIN = 0 THEN 0 ELSE 1 END  AS WIN
+				       , A.R_1_CHAMP                            AS CHAMP
+				       , IFNULL(ROUND((R_1_K+R_1_A)/R_1_D,2),0) AS KDA
+				       , A.R_1_K                                AS K
+				       , A.R_1_D                                AS D
+				       , A.R_1_A                                AS A
+				       , A.REG_FLG                              AS REG_FLG
+				       , DATE_FORMAT(A.GDATE,'%y-%m-%d %H:%i')  AS WDATE
+				       , CASE WHEN A.REG_FLG = 0 THEN IFNULL(ELO.BEF_ELO,'사용자 수정') 
+						        ELSE '수시 경기'
+								   END                              AS BEF_ELO
+				       , CASE WHEN A.REG_FLG = 0 THEN IFNULL(ELO.PM_ELO,'-') 
+						        ELSE '-'
+								   END                              AS PM_ELO
+				    FROM CW A
+				    LEFT OUTER JOIN ELO_HIST ELO ON A.NO = ELO.CW AND A.R_1_EMAIL = ELO.EMAIL
+				   WHERE A.CLAN = getClan(#{sEmail})
+				     AND A.REF_FLG = 1
+				     AND getNick(A.R_1_EMAIL,#{sEmail}) = #{nick}
+				     AND A.DEL_YN = 'N'
+				UNION ALL
+				  SELECT A.NO                                   AS NO
+				       , CASE WHEN A.WIN = 0 THEN 0 ELSE 1 END  AS WIN
+				       , A.R_2_CHAMP                            AS CHAMP
+				       , IFNULL(ROUND((R_2_K+R_2_A)/R_2_D,2),0) AS KDA
+				       , A.R_2_K                                AS K
+				       , A.R_2_D                                AS D
+				       , A.R_2_A                                AS A
+				       , A.REG_FLG                              AS REG_FLG
+				       , DATE_FORMAT(A.GDATE,'%y-%m-%d %H:%i')  AS WDATE
+				       , CASE WHEN A.REG_FLG = 0 THEN IFNULL(ELO.BEF_ELO,'사용자 수정') 
+						        ELSE '수시 경기'
+								   END                              AS BEF_ELO
+				       , CASE WHEN A.REG_FLG = 0 THEN IFNULL(ELO.PM_ELO,'-') 
+						        ELSE '-'
+								   END                              AS PM_ELO
+				    FROM CW A
+				    LEFT OUTER JOIN ELO_HIST ELO ON A.NO = ELO.CW AND A.R_2_EMAIL = ELO.EMAIL
+				   WHERE A.CLAN = getClan(#{sEmail})
+				     AND A.REF_FLG = 1
+				     AND getNick(A.R_2_EMAIL,#{sEmail}) = #{nick}
+				     AND A.DEL_YN = 'N'
+				UNION ALL
+				  SELECT A.NO                                   AS NO
+				       , CASE WHEN A.WIN = 0 THEN 0 ELSE 1 END  AS WIN
+				       , A.R_3_CHAMP                            AS CHAMP
+				       , IFNULL(ROUND((R_3_K+R_3_A)/R_3_D,2),0) AS KDA
+				       , A.R_3_K                                AS K
+				       , A.R_3_D                                AS D
+				       , A.R_3_A                                AS A
+				       , A.REG_FLG                              AS REG_FLG
+				       , DATE_FORMAT(A.GDATE,'%y-%m-%d %H:%i')  AS WDATE
+				       , CASE WHEN A.REG_FLG = 0 THEN IFNULL(ELO.BEF_ELO,'사용자 수정') 
+						        ELSE '수시 경기'
+								   END                              AS BEF_ELO
+				       , CASE WHEN A.REG_FLG = 0 THEN IFNULL(ELO.PM_ELO,'-') 
+						        ELSE '-'
+								   END                              AS PM_ELO
+				    FROM CW A
+				    LEFT OUTER JOIN ELO_HIST ELO ON A.NO = ELO.CW AND A.R_3_EMAIL = ELO.EMAIL
+				   WHERE A.CLAN = getClan(#{sEmail})
+				     AND A.REF_FLG = 1
+				     AND getNick(A.R_3_EMAIL,#{sEmail}) = #{nick}
+				     AND A.DEL_YN = 'N'
+				UNION ALL
+				  SELECT A.NO                                   AS NO
+				       , CASE WHEN A.WIN = 0 THEN 0 ELSE 1 END  AS WIN
+				       , A.R_4_CHAMP                            AS CHAMP
+				       , IFNULL(ROUND((R_4_K+R_4_A)/R_4_D,2),0) AS KDA
+				       , A.R_4_K                                AS K
+				       , A.R_4_D                                AS D
+				       , A.R_4_A                                AS A
+				       , A.REG_FLG                              AS REG_FLG
+				       , DATE_FORMAT(A.GDATE,'%y-%m-%d %H:%i')  AS WDATE
+				       , CASE WHEN A.REG_FLG = 0 THEN IFNULL(ELO.BEF_ELO,'사용자 수정') 
+						        ELSE '수시 경기'
+								   END                              AS BEF_ELO
+				       , CASE WHEN A.REG_FLG = 0 THEN IFNULL(ELO.PM_ELO,'-') 
+						        ELSE '-'
+								   END                              AS PM_ELO
+				    FROM CW A
+				    LEFT OUTER JOIN ELO_HIST ELO ON A.NO = ELO.CW AND A.R_4_EMAIL = ELO.EMAIL
+				   WHERE A.CLAN = getClan(#{sEmail})
+				     AND A.REF_FLG = 1
+				     AND getNick(A.R_4_EMAIL,#{sEmail}) = #{nick}
+				     AND A.DEL_YN = 'N'
+				UNION ALL
+				  SELECT A.NO                                   AS NO
+				       , CASE WHEN A.WIN = 0 THEN 0 ELSE 1 END  AS WIN
+				       , A.R_5_CHAMP                            AS CHAMP
+				       , IFNULL(ROUND((R_5_K+R_5_A)/R_5_D,2),0) AS KDA
+				       , A.R_5_K                                AS K
+				       , A.R_5_D                                AS D
+				       , A.R_5_A                                AS A
+				       , A.REG_FLG                              AS REG_FLG
+				       , DATE_FORMAT(A.GDATE,'%y-%m-%d %H:%i')  AS WDATE
+				       , CASE WHEN A.REG_FLG = 0 THEN IFNULL(ELO.BEF_ELO,'사용자 수정') 
+						        ELSE '수시 경기'
+								   END                              AS BEF_ELO
+				       , CASE WHEN A.REG_FLG = 0 THEN IFNULL(ELO.PM_ELO,'-') 
+						        ELSE '-'
+								   END                              AS PM_ELO
+				    FROM CW A
+				    LEFT OUTER JOIN ELO_HIST ELO ON A.NO = ELO.CW AND A.R_5_EMAIL = ELO.EMAIL
+				   WHERE A.CLAN = getClan(#{sEmail})
+				     AND A.REF_FLG = 1
+				     AND getNick(A.R_5_EMAIL,#{sEmail}) = #{nick}
+				     AND A.DEL_YN = 'N'
+				   ) RES
+   		 ) TOT
+   WHERE TOT.RNK BETWEEN #{startCnt} AND #{endCnt}
+</select>
+
+<select id="getDivDataCnt" parameterType="hashMap" resultType="int">
+ SELECT SUM(TOT.CNT) AS CNT
+   FROM (
+		 SELECT 1 AS CNT
+		   FROM (
+			  SELECT A.B_1_CHAMP AS CHAMP
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND #{nick} = getNick(A.B_1_EMAIL, #{sEmail})
+				  AND A.DEL_YN = 'N'
+			UNION ALL
+			  SELECT A.B_2_CHAMP AS CHAMP
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND #{nick} = getNick(A.B_2_EMAIL, #{sEmail})
+				  AND A.DEL_YN = 'N'
+			UNION ALL
+			  SELECT A.B_3_CHAMP AS CHAMP
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND #{nick} = getNick(A.B_3_EMAIL, #{sEmail})
+				  AND A.DEL_YN = 'N'
+			UNION ALL
+			  SELECT A.B_4_CHAMP AS CHAMP
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND #{nick} = getNick(A.B_4_EMAIL, #{sEmail})
+				  AND A.DEL_YN = 'N'
+			UNION ALL
+			  SELECT A.B_5_CHAMP AS CHAMP
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND #{nick} = getNick(A.B_5_EMAIL, #{sEmail})
+			 	  AND A.DEL_YN = 'N'
+			UNION ALL
+			  SELECT A.R_1_CHAMP AS CHAMP
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND #{nick} = getNick(A.R_1_EMAIL, #{sEmail})
+				  AND A.DEL_YN = 'N'
+			UNION ALL
+			  SELECT A.R_2_CHAMP AS CHAMP
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND #{nick} = getNick(A.R_2_EMAIL, #{sEmail})
+				  AND A.DEL_YN = 'N'
+			UNION ALL
+			  SELECT A.R_3_CHAMP AS CHAMP
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND #{nick} = getNick(A.R_3_EMAIL, #{sEmail})
+				  AND A.DEL_YN = 'N'
+			UNION ALL
+			  SELECT A.R_4_CHAMP AS CHAMP
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND #{nick} = getNick(A.R_4_EMAIL, #{sEmail})
+				  AND A.DEL_YN = 'N'
+			UNION ALL
+			  SELECT A.R_5_CHAMP AS CHAMP
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND #{nick} = getNick(A.R_5_EMAIL, #{sEmail})
+			     AND A.DEL_YN = 'N'
+		        ) RES
+		GROUP BY RES.CHAMP
+        ) TOT
+</select>
+
+<select id="getDiv1DataList" parameterType="hashMap" resultType="hashMap">
+  SELECT DAT.CHAMP    AS CHAMP
+       , DAT.K        AS K
+       , DAT.D        AS D
+   	   , DAT.A        AS A
+   	   , DAT.KDA      AS KDA
+   	   , DAT.WIN      AS WIN
+   	   , DAT.DEF      AS DEF
+   	   , DAT.CNT      AS GAME_CNT
+   	   , DAT.WIN_RATE AS WIN_RATE
+    FROM (
+		 SELECT RES.CHAMP     AS CHAMP
+		      , COUNT(*)      AS CNT
+		      , SUM(RES.K)    AS K
+		      , SUM(RES.D)    AS D
+		      , SUM(RES.A)    AS A
+		      , ROUND((SUM(RES.K)+SUM(RES.A))/SUM(RES.D),2) AS KDA
+		      , SUM(RES.WIN) AS WIN
+		      , SUM(RES.DEF) AS DEF
+		      , ROUND((SUM(RES.WIN)/(SUM(RES.WIN)+SUM(RES.DEF)))*100) AS WIN_RATE
+		      , ROW_NUMBER() OVER(ORDER BY COUNT(*) DESC, ROUND((SUM(RES.WIN)/(SUM(RES.WIN)+SUM(RES.DEF)))*100) DESC, ROUND((SUM(RES.K)+SUM(RES.A))/SUM(RES.D),2) DESC) AS RNK
+		   FROM (
+			  SELECT A.B_1_CHAMP AS CHAMP
+			       , A.B_1_K     AS K
+			       , A.B_1_D     AS D
+			       , A.B_1_A     AS A
+			       , CASE WHEN  A.WIN = 0 THEN 1 ELSE 0 END WIN
+			       , CASE WHEN  A.WIN = 1 THEN 1 ELSE 0 END DEF
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND #{nick} = getNick(A.B_1_EMAIL, #{sEmail})
+				  AND A.DEL_YN = 'N'
+			UNION ALL
+			  SELECT A.B_2_CHAMP AS CHAMP
+			       , A.B_2_K     AS K
+			       , A.B_2_D     AS D
+			       , A.B_2_A     AS A
+			       , CASE WHEN  A.WIN = 0 THEN 1 ELSE 0 END WIN
+			       , CASE WHEN  A.WIN = 1 THEN 1 ELSE 0 END DEF
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND #{nick} = getNick(A.B_2_EMAIL, #{sEmail})
+				  AND A.DEL_YN = 'N'
+			UNION ALL
+			  SELECT A.B_3_CHAMP AS CHAMP
+			       , A.B_3_K     AS K
+			       , A.B_3_D     AS D
+			       , A.B_3_A     AS A
+			       , CASE WHEN  A.WIN = 0 THEN 1 ELSE 0 END WIN
+			       , CASE WHEN  A.WIN = 1 THEN 1 ELSE 0 END DEF
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND #{nick} = getNick(A.B_3_EMAIL, #{sEmail})
+				  AND A.DEL_YN = 'N'
+			UNION ALL
+			  SELECT A.B_4_CHAMP AS CHAMP
+			       , A.B_4_K     AS K
+			       , A.B_4_D     AS D
+			       , A.B_4_A     AS A
+			       , CASE WHEN  A.WIN = 0 THEN 1 ELSE 0 END WIN
+			       , CASE WHEN  A.WIN = 1 THEN 1 ELSE 0 END DEF
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND #{nick} = getNick(A.B_4_EMAIL, #{sEmail})
+				  AND A.DEL_YN = 'N'
+			UNION ALL
+			  SELECT A.B_5_CHAMP AS CHAMP
+			       , A.B_5_K     AS K
+			       , A.B_5_D     AS D
+			       , A.B_5_A     AS A
+			       , CASE WHEN  A.WIN = 0 THEN 1 ELSE 0 END WIN
+			       , CASE WHEN  A.WIN = 1 THEN 1 ELSE 0 END DEF
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND #{nick} = getNick(A.B_5_EMAIL, #{sEmail})
+			 	  AND A.DEL_YN = 'N'
+			UNION ALL
+			  SELECT A.R_1_CHAMP AS CHAMP
+			       , A.R_1_K     AS K
+			       , A.R_1_D     AS D
+			       , A.R_1_A     AS A
+				    , CASE WHEN  A.WIN = 1 THEN 1 ELSE 0 END WIN
+				    , CASE WHEN  A.WIN = 0 THEN 1 ELSE 0 END DEF
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND #{nick} = getNick(A.R_1_EMAIL, #{sEmail})
+				  AND A.DEL_YN = 'N'
+			UNION ALL
+			  SELECT A.R_2_CHAMP AS CHAMP
+			       , A.R_2_K     AS K
+			       , A.R_2_D     AS D
+			       , A.R_2_A     AS A
+			       , CASE WHEN  A.WIN = 1 THEN 1 ELSE 0 END WIN
+			       , CASE WHEN  A.WIN = 0 THEN 1 ELSE 0 END DEF
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND #{nick} = getNick(A.R_2_EMAIL, #{sEmail})
+				  AND A.DEL_YN = 'N'
+			UNION ALL
+			  SELECT A.R_3_CHAMP AS CHAMP
+			       , A.R_3_K     AS K
+			       , A.R_3_D     AS D
+			       , A.R_3_A     AS A
+			       , CASE WHEN  A.WIN = 1 THEN 1 ELSE 0 END WIN
+			       , CASE WHEN  A.WIN = 0 THEN 1 ELSE 0 END DEF
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND #{nick} = getNick(A.R_3_EMAIL, #{sEmail})
+				  AND A.DEL_YN = 'N'
+			UNION ALL
+			  SELECT A.R_4_CHAMP AS CHAMP
+			       , A.R_4_K     AS K
+			       , A.R_4_D     AS D
+			       , A.R_4_A     AS A
+			       , CASE WHEN  A.WIN = 1 THEN 1 ELSE 0 END WIN
+			       , CASE WHEN  A.WIN = 0 THEN 1 ELSE 0 END DEF
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND #{nick} = getNick(A.R_4_EMAIL, #{sEmail})
+				  AND A.DEL_YN = 'N'
+			UNION ALL
+			  SELECT A.R_5_CHAMP AS CHAMP
+			       , A.R_5_K     AS K
+			       , A.R_5_D     AS D
+			       , A.R_5_A     AS A
+			       , CASE WHEN  A.WIN = 1 THEN 1 ELSE 0 END WIN
+			       , CASE WHEN  A.WIN = 0 THEN 1 ELSE 0 END DEF
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND #{nick} = getNick(A.R_5_EMAIL, #{sEmail})
+			     AND A.DEL_YN = 'N'
+		        ) RES
+		 GROUP BY RES.CHAMP
+	       ) DAT
+  WHERE DAT.RNK BETWEEN #{startCnt} AND #{endCnt}
+</select>
+
+<select id="getDiv2DataList" parameterType="hashMap" resultType="hashMap">
+  SELECT DAT.CHAMP    AS CHAMP
+       , DAT.K        AS K
+       , DAT.D        AS D
+    		 , DAT.A        AS A
+    		 , DAT.KDA      AS KDA
+    		 , DAT.WIN      AS WIN
+    		 , DAT.DEF      AS DEF
+    		 , DAT.CNT      AS GAME_CNT
+    		 , DAT.WIN_RATE AS WIN_RATE
+    FROM (
+		 SELECT RES.CHAMP     AS CHAMP
+		      , COUNT(*)      AS CNT
+		      , SUM(RES.K)    AS K
+		      , SUM(RES.D)    AS D
+		      , SUM(RES.A)    AS A
+		      , ROUND((SUM(RES.K)+SUM(RES.A))/SUM(RES.D),2) AS KDA
+		      , SUM(RES.WIN) AS WIN
+		      , SUM(RES.DEF) AS DEF
+		      , ROUND((SUM(RES.WIN)/(SUM(RES.WIN)+SUM(RES.DEF)))*100) AS WIN_RATE
+		      , ROW_NUMBER() OVER(ORDER BY ROUND((SUM(RES.WIN)/(SUM(RES.WIN)+SUM(RES.DEF)))*100) DESC, COUNT(*) DESC, ROUND((SUM(RES.K)+SUM(RES.A))/SUM(RES.D),2) DESC) AS RNK
+		   FROM (
+			  SELECT A.B_1_CHAMP AS CHAMP
+			       , A.B_1_K     AS K
+			       , A.B_1_D     AS D
+			       , A.B_1_A     AS A
+			       , CASE WHEN  A.WIN = 0 THEN 1 ELSE 0 END WIN
+			       , CASE WHEN  A.WIN = 1 THEN 1 ELSE 0 END DEF
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND #{nick} = getNick(A.B_1_EMAIL, #{sEmail})
+				  AND A.DEL_YN = 'N'
+			UNION ALL
+			  SELECT A.B_2_CHAMP AS CHAMP
+			       , A.B_2_K     AS K
+			       , A.B_2_D     AS D
+			       , A.B_2_A     AS A
+			       , CASE WHEN  A.WIN = 0 THEN 1 ELSE 0 END WIN
+			       , CASE WHEN  A.WIN = 1 THEN 1 ELSE 0 END DEF
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND #{nick} = getNick(A.B_2_EMAIL, #{sEmail})
+				  AND A.DEL_YN = 'N'
+			UNION ALL
+			  SELECT A.B_3_CHAMP AS CHAMP
+			       , A.B_3_K     AS K
+			       , A.B_3_D     AS D
+			       , A.B_3_A     AS A
+			       , CASE WHEN  A.WIN = 0 THEN 1 ELSE 0 END WIN
+			       , CASE WHEN  A.WIN = 1 THEN 1 ELSE 0 END DEF
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND #{nick} = getNick(A.B_3_EMAIL, #{sEmail})
+				  AND A.DEL_YN = 'N'
+			UNION ALL
+			  SELECT A.B_4_CHAMP AS CHAMP
+			       , A.B_4_K     AS K
+			       , A.B_4_D     AS D
+			       , A.B_4_A     AS A
+			       , CASE WHEN  A.WIN = 0 THEN 1 ELSE 0 END WIN
+			       , CASE WHEN  A.WIN = 1 THEN 1 ELSE 0 END DEF
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND #{nick} = getNick(A.B_4_EMAIL, #{sEmail})
+				  AND A.DEL_YN = 'N'
+			UNION ALL
+			  SELECT A.B_5_CHAMP AS CHAMP
+			       , A.B_5_K     AS K
+			       , A.B_5_D     AS D
+			       , A.B_5_A     AS A
+			       , CASE WHEN  A.WIN = 0 THEN 1 ELSE 0 END WIN
+			       , CASE WHEN  A.WIN = 1 THEN 1 ELSE 0 END DEF
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND #{nick} = getNick(A.B_5_EMAIL, #{sEmail})
+			 	  AND A.DEL_YN = 'N'
+			UNION ALL
+			  SELECT A.R_1_CHAMP AS CHAMP
+			       , A.R_1_K     AS K
+			       , A.R_1_D     AS D
+			       , A.R_1_A     AS A
+				    , CASE WHEN  A.WIN = 1 THEN 1 ELSE 0 END WIN
+				    , CASE WHEN  A.WIN = 0 THEN 1 ELSE 0 END DEF
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND #{nick} = getNick(A.R_1_EMAIL, #{sEmail})
+				  AND A.DEL_YN = 'N'
+			UNION ALL
+			  SELECT A.R_2_CHAMP AS CHAMP
+			       , A.R_2_K     AS K
+			       , A.R_2_D     AS D
+			       , A.R_2_A     AS A
+			       , CASE WHEN  A.WIN = 1 THEN 1 ELSE 0 END WIN
+			       , CASE WHEN  A.WIN = 0 THEN 1 ELSE 0 END DEF
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND #{nick} = getNick(A.R_2_EMAIL, #{sEmail})
+				  AND A.DEL_YN = 'N'
+			UNION ALL
+			  SELECT A.R_3_CHAMP AS CHAMP
+			       , A.R_3_K     AS K
+			       , A.R_3_D     AS D
+			       , A.R_3_A     AS A
+			       , CASE WHEN  A.WIN = 1 THEN 1 ELSE 0 END WIN
+			       , CASE WHEN  A.WIN = 0 THEN 1 ELSE 0 END DEF
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND #{nick} = getNick(A.R_3_EMAIL, #{sEmail})
+				  AND A.DEL_YN = 'N'
+			UNION ALL
+			  SELECT A.R_4_CHAMP AS CHAMP
+			       , A.R_4_K     AS K
+			       , A.R_4_D     AS D
+			       , A.R_4_A     AS A
+			       , CASE WHEN  A.WIN = 1 THEN 1 ELSE 0 END WIN
+			       , CASE WHEN  A.WIN = 0 THEN 1 ELSE 0 END DEF
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND #{nick} = getNick(A.R_4_EMAIL, #{sEmail})
+				  AND A.DEL_YN = 'N'
+			UNION ALL
+			  SELECT A.R_5_CHAMP AS CHAMP
+			       , A.R_5_K     AS K
+			       , A.R_5_D     AS D
+			       , A.R_5_A     AS A
+			       , CASE WHEN  A.WIN = 1 THEN 1 ELSE 0 END WIN
+			       , CASE WHEN  A.WIN = 0 THEN 1 ELSE 0 END DEF
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND #{nick} = getNick(A.R_5_EMAIL, #{sEmail})
+			     AND A.DEL_YN = 'N'
+		        ) RES
+		 GROUP BY RES.CHAMP
+	       ) DAT
+  WHERE DAT.RNK BETWEEN #{startCnt} AND #{endCnt}
+</select>
+
+<select id="getDiv3DataList" parameterType="hashMap" resultType="hashMap">
+  SELECT DAT.CHAMP    AS CHAMP
+       , DAT.K        AS K
+       , DAT.D        AS D
+    		 , DAT.A        AS A
+    		 , DAT.KDA      AS KDA
+    		 , DAT.WIN      AS WIN
+    		 , DAT.DEF      AS DEF
+    		 , DAT.CNT      AS GAME_CNT
+    		 , DAT.WIN_RATE AS WIN_RATE
+    FROM (
+		 SELECT RES.CHAMP     AS CHAMP
+		      , COUNT(*)      AS CNT
+		      , SUM(RES.K)    AS K
+		      , SUM(RES.D)    AS D
+		      , SUM(RES.A)    AS A
+		      , ROUND((SUM(RES.K)+SUM(RES.A))/SUM(RES.D),2) AS KDA
+		      , SUM(RES.WIN) AS WIN
+		      , SUM(RES.DEF) AS DEF
+		      , ROUND((SUM(RES.WIN)/(SUM(RES.WIN)+SUM(RES.DEF)))*100) AS WIN_RATE
+		      , ROW_NUMBER() OVER(ORDER BY ROUND((SUM(RES.K)+SUM(RES.A))/SUM(RES.D),2) DESC, COUNT(*) DESC, ROUND((SUM(RES.WIN)/(SUM(RES.WIN)+SUM(RES.DEF)))*100) DESC) AS RNK
+		   FROM (
+			  SELECT A.B_1_CHAMP AS CHAMP
+			       , A.B_1_K     AS K
+			       , A.B_1_D     AS D
+			       , A.B_1_A     AS A
+			       , CASE WHEN  A.WIN = 0 THEN 1 ELSE 0 END WIN
+			       , CASE WHEN  A.WIN = 1 THEN 1 ELSE 0 END DEF
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND #{nick} = getNick(A.B_1_EMAIL, #{sEmail})
+				  AND A.DEL_YN = 'N'
+			UNION ALL
+			  SELECT A.B_2_CHAMP AS CHAMP
+			       , A.B_2_K     AS K
+			       , A.B_2_D     AS D
+			       , A.B_2_A     AS A
+			       , CASE WHEN  A.WIN = 0 THEN 1 ELSE 0 END WIN
+			       , CASE WHEN  A.WIN = 1 THEN 1 ELSE 0 END DEF
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND #{nick} = getNick(A.B_2_EMAIL, #{sEmail})
+				  AND A.DEL_YN = 'N'
+			UNION ALL
+			  SELECT A.B_3_CHAMP AS CHAMP
+			       , A.B_3_K     AS K
+			       , A.B_3_D     AS D
+			       , A.B_3_A     AS A
+			       , CASE WHEN  A.WIN = 0 THEN 1 ELSE 0 END WIN
+			       , CASE WHEN  A.WIN = 1 THEN 1 ELSE 0 END DEF
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND #{nick} = getNick(A.B_3_EMAIL, #{sEmail})
+				  AND A.DEL_YN = 'N'
+			UNION ALL
+			  SELECT A.B_4_CHAMP AS CHAMP
+			       , A.B_4_K     AS K
+			       , A.B_4_D     AS D
+			       , A.B_4_A     AS A
+			       , CASE WHEN  A.WIN = 0 THEN 1 ELSE 0 END WIN
+			       , CASE WHEN  A.WIN = 1 THEN 1 ELSE 0 END DEF
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND #{nick} = getNick(A.B_4_EMAIL, #{sEmail})
+				  AND A.DEL_YN = 'N'
+			UNION ALL
+			  SELECT A.B_5_CHAMP AS CHAMP
+			       , A.B_5_K     AS K
+			       , A.B_5_D     AS D
+			       , A.B_5_A     AS A
+			       , CASE WHEN  A.WIN = 0 THEN 1 ELSE 0 END WIN
+			       , CASE WHEN  A.WIN = 1 THEN 1 ELSE 0 END DEF
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND #{nick} = getNick(A.B_5_EMAIL, #{sEmail})
+			 	  AND A.DEL_YN = 'N'
+			UNION ALL
+			  SELECT A.R_1_CHAMP AS CHAMP
+			       , A.R_1_K     AS K
+			       , A.R_1_D     AS D
+			       , A.R_1_A     AS A
+				    , CASE WHEN  A.WIN = 1 THEN 1 ELSE 0 END WIN
+				    , CASE WHEN  A.WIN = 0 THEN 1 ELSE 0 END DEF
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND #{nick} = getNick(A.R_1_EMAIL, #{sEmail})
+				  AND A.DEL_YN = 'N'
+			UNION ALL
+			  SELECT A.R_2_CHAMP AS CHAMP
+			       , A.R_2_K     AS K
+			       , A.R_2_D     AS D
+			       , A.R_2_A     AS A
+			       , CASE WHEN  A.WIN = 1 THEN 1 ELSE 0 END WIN
+			       , CASE WHEN  A.WIN = 0 THEN 1 ELSE 0 END DEF
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND #{nick} = getNick(A.R_2_EMAIL, #{sEmail})
+				  AND A.DEL_YN = 'N'
+			UNION ALL
+			  SELECT A.R_3_CHAMP AS CHAMP
+			       , A.R_3_K     AS K
+			       , A.R_3_D     AS D
+			       , A.R_3_A     AS A
+			       , CASE WHEN  A.WIN = 1 THEN 1 ELSE 0 END WIN
+			       , CASE WHEN  A.WIN = 0 THEN 1 ELSE 0 END DEF
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND #{nick} = getNick(A.R_3_EMAIL, #{sEmail})
+				  AND A.DEL_YN = 'N'
+			UNION ALL
+			  SELECT A.R_4_CHAMP AS CHAMP
+			       , A.R_4_K     AS K
+			       , A.R_4_D     AS D
+			       , A.R_4_A     AS A
+			       , CASE WHEN  A.WIN = 1 THEN 1 ELSE 0 END WIN
+			       , CASE WHEN  A.WIN = 0 THEN 1 ELSE 0 END DEF
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND #{nick} = getNick(A.R_4_EMAIL, #{sEmail})
+				  AND A.DEL_YN = 'N'
+			UNION ALL
+			  SELECT A.R_5_CHAMP AS CHAMP
+			       , A.R_5_K     AS K
+			       , A.R_5_D     AS D
+			       , A.R_5_A     AS A
+			       , CASE WHEN  A.WIN = 1 THEN 1 ELSE 0 END WIN
+			       , CASE WHEN  A.WIN = 0 THEN 1 ELSE 0 END DEF
+			    FROM CW A
+			   WHERE A.CLAN = getClan(#{sEmail})
+			     AND A.REF_FLG = 1
+			     AND #{nick} = getNick(A.R_5_EMAIL, #{sEmail})
+			     AND A.DEL_YN = 'N'
+		        ) RES
+		 GROUP BY RES.CHAMP
+	       ) DAT
+  WHERE DAT.RNK BETWEEN #{startCnt} AND #{endCnt}
+</select>
+
+</mapper>

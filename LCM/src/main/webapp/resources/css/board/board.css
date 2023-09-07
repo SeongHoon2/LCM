@@ -1,0 +1,187 @@
+@charset "UTF-8";
+
+.boardDiv{
+	width : 1200px;
+	margin : 0 auto;
+}
+
+.boardMenuDiv{
+	width : 209px;
+    margin-left : 20px;
+    display : inline-block;
+    vertical-align: top;
+    text-align: center;
+    background-color : #3275A214;
+    border-radius : 10px;
+}
+
+.boardMenuDiv_noCtg{
+	width : 209px;
+	height : 40px;
+    text-align: center;
+    line-height: 3;
+}
+
+.boardConDiv_noDoc{
+	width : 926px;
+	height : 666px;
+    background-color : #3275A214;
+    border-radius : 10px;
+}
+
+.boardConDiv{
+	padding-left : 20px;
+	padding-right : 20px;
+	width : 926px;
+    min-height : 678px;
+    margin-bottom : 10px;
+	display : inline-block;
+}
+
+.boardConDiv_doc{
+	width : 100%;
+	height : 666px;
+}
+
+.boardConDiv_Btn{
+	width : 90%;
+	height : 25px;
+	margin-top : 8px;
+	text-align : center;
+}
+
+.boardPgNPBtn, .boardPgNBtn{
+	font-size : 13px;
+	border : 0;
+	cursor : pointer;
+	background-color : white;
+	font-family : 'IBM Plex Sans KR', sans-serif;
+}
+
+.boardPgNBtn:hover, .boardConDiv_writeBtn:hover{
+	font-weight : bold;
+}
+
+.boardConDiv_write{
+	position: absolute;
+    width: 40px;
+    height: 20px;
+    margin-top: -27px;
+}
+
+.boardConDiv_writeBtn{
+	font-size : 13px;
+	border : 0;
+	cursor : pointer;
+	background-color : white;
+	font-family : 'IBM Plex Sans KR', sans-serif;
+}
+
+.boardConDiv_search{
+    position: absolute;
+    width: 252px;
+    height: 20px;
+    margin-top: -27px;
+    margin-left: 675px;
+    font-family : 'IBM Plex Sans KR', sans-serif;
+}
+
+.boardConDiv_combo{
+	width : 60px;
+	height : 26px;
+	font-size : 12px;
+	font-family : 'IBM Plex Sans KR', sans-serif;
+	vertical-align: top;
+}
+
+.boardCon_search{
+	padding-left : 6px;
+	width : 154px;
+	height : 20px;
+	font-size : 12px;
+}
+
+.boardConDiv_search img{
+	width : 14px;
+	cursor : pointer;
+	vertical-align : middle;
+}
+
+.boardMenuDiv table, .boardConDiv table{
+	width : 100%;
+}
+
+.boardCtgTr{
+	width : 100%;
+	height : 30px;
+	cursor : pointer;
+	line-height : 3;
+}
+
+
+.boardDocTr_top{
+	width : 100%;
+	height : 30px;
+	background-color: #3275A2;
+	color : white;
+	font-weight : bold;
+	font-size : 14px;
+	border-radius : 3px;
+	line-height: 2;
+}
+
+.boardDocTr_top_inline{
+	height : 100%;
+	display : inline-block;
+	vertical-align : top;
+	text-align : center;
+}
+
+.boardDocTr{
+	width : 100%;
+	height : 44px;
+	cursor : pointer;
+	font-size : 13px;
+	border-bottom: 1px solid #EFEFEF;
+}
+
+.boardDocBlankTr{
+	width : 100%;
+	height : 44px;
+	line-height : 3;
+	border-bottom: 1px solid #EFEFEF;
+}
+
+.selectBoardCtgTr{
+	width : 100%;
+	height : 30px;
+	cursor : pointer;
+	font-weight : bold;
+	line-height : 3;
+	color : #3275A2;
+}
+
+.boardCtgTr:hover{
+	font-weight : bold;
+	color : #3275A2;
+}
+
+.boardDocTr:hover{
+	font-weight : bold;
+	background-color : #3275A214;
+}
+
+.boardDocTr_title{
+	width : 76%;
+	vertical-align: middle;
+}
+
+.boardDocTr_nick{
+	width : 11%;
+	vertical-align: middle;
+}
+
+.boardDocTr_wdate{
+	width : 13%;
+	vertical-align: middle;
+}
